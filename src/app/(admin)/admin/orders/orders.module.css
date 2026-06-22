@@ -1,0 +1,155 @@
+.page {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: #1a1209;
+}
+
+.subtitle {
+  color: rgba(26, 18, 9, 0.6);
+  font-size: 0.875rem;
+}
+
+/* ─── Controls ───────────────────────────────────────────── */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.search {
+  flex: 1;
+  max-width: 400px;
+}
+
+.input, .select {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: #1a1209;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.input:focus, .select:focus {
+  border-color: #c9a96e;
+}
+
+/* ─── Table ──────────────────────────────────────────────── */
+.tableWrap {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(26, 18, 9, 0.5);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  background: #faf6f0;
+}
+
+.table td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: #1a1209;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.cellId {
+  font-family: monospace;
+  font-weight: 600;
+  color: rgba(26, 18, 9, 0.7);
+}
+
+.cellCustomer {
+  display: flex;
+  flex-direction: column;
+}
+
+.cellPhone {
+  font-size: 0.75rem;
+  color: rgba(26, 18, 9, 0.5);
+}
+
+.cellPrice {
+  font-family: var(--font-display);
+  color: #8b4513;
+  font-weight: 500;
+}
+
+.cellTime {
+  color: rgba(26, 18, 9, 0.5);
+  font-size: 0.75rem;
+}
+
+.actionBtn {
+  background: #faf6f0;
+  border: 1px solid rgba(0,0,0,0.05);
+  color: #1a1209;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.actionBtn:hover {
+  background: #1a1209;
+  color: white;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.PENDING_VERIFICATION { background: rgba(242, 153, 74, 0.15); color: #b05c00; }
+.PENDING_DELIVERY { background: rgba(45, 122, 58, 0.1); color: #2d7a3a; }
+.DELIVERED { background: rgba(0, 0, 0, 0.05); color: rgba(0, 0, 0, 0.5); }
+.CANCELLED { background: rgba(192, 57, 43, 0.1); color: #c0392b; }
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .controls { flex-direction: column; }
+  .search, .select { max-width: 100%; }
+}

@@ -1,0 +1,276 @@
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-16);
+  align-items: start;
+}
+
+/* ─── Gallery ────────────────────────────────────────────── */
+.gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--space-6));
+}
+
+.mainImage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--parchment);
+  box-shadow: var(--shadow);
+}
+
+.mainImg {
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.mainImage:hover .mainImg {
+  transform: scale(1.04);
+}
+
+.thumbnails {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.thumb {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--parchment);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  padding: 0;
+}
+
+.thumb:hover { border-color: var(--cognac-light); }
+.activeThumb { border-color: var(--cognac) !important; }
+
+.thumbImg { object-fit: cover; }
+
+/* ─── Info ───────────────────────────────────────────────── */
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--warm-grey);
+}
+
+.breadcrumb a {
+  color: var(--warm-grey);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.breadcrumb a:hover { color: var(--cognac); }
+
+.category {
+  color: var(--cognac) !important;
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-3xl), 3vw, var(--text-4xl));
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 500;
+  color: var(--cognac);
+}
+
+.description {
+  color: var(--text-secondary);
+  line-height: 1.75;
+  font-size: var(--text-base);
+  max-width: 52ch;
+}
+
+/* ─── Details ────────────────────────────────────────────── */
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--parchment);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+  gap: var(--space-4);
+}
+
+.detailLabel {
+  color: var(--warm-grey);
+  font-weight: 500;
+}
+
+.detailValue {
+  color: var(--ink);
+  font-weight: 400;
+  text-align: right;
+}
+
+/* ─── Embossing ──────────────────────────────────────────── */
+.embossingBlock {
+  background: var(--parchment);
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.embossingLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.embossingCheck {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cognac);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.embossingText {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.embossingText strong { color: var(--ink); }
+.embossingText small { color: var(--warm-grey); }
+
+.embossingIcon {
+  color: var(--gold);
+  font-size: var(--text-lg);
+  flex-shrink: 0;
+}
+
+.embossingWhatsapp {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  gap: var(--space-2);
+  animation: fadeInUp 0.3s ease;
+}
+
+/* ─── Actions ────────────────────────────────────────────── */
+.actions {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.qtyWrapper {
+  display: flex;
+  align-items: center;
+  background: var(--parchment);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.qtyBtn {
+  width: 40px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-xl);
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1;
+  transition: background var(--transition-fast);
+}
+
+.qtyBtn:hover { background: var(--parchment-dark); }
+
+.qty {
+  min-width: 40px;
+  text-align: center;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.addBtn {
+  flex: 1;
+  justify-content: center;
+  padding-block: 0.875rem;
+}
+
+.whatsappBtn {
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ─── Trust row ──────────────────────────────────────────── */
+.trustRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--warm-grey);
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+  .gallery { position: static; }
+}

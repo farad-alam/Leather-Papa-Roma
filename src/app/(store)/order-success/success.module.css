@@ -1,0 +1,111 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--container-padding);
+  padding-top: calc(var(--navbar-height) + var(--space-12));
+  background: var(--bg-secondary);
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: clamp(var(--space-8), 5vw, var(--space-16));
+  max-width: 640px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.5s ease;
+}
+
+.icon {
+  width: 72px;
+  height: 72px;
+  background: var(--success);
+  color: white;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 8px rgba(39, 174, 96, 0.12);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+}
+
+.orderNum {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--cognac);
+  background: rgba(139, 69, 19, 0.08);
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-full);
+}
+
+.message {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 50ch;
+  text-align: center;
+}
+
+.steps {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  width: 100%;
+  background: var(--parchment);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+  max-width: 120px;
+}
+
+.stepIcon { font-size: 1.5rem; }
+
+.step strong {
+  font-size: var(--text-sm);
+  color: var(--ink);
+  display: block;
+}
+
+.step p {
+  font-size: var(--text-xs);
+  color: var(--warm-grey);
+  max-width: none;
+  text-align: center;
+}
+
+.stepArrow {
+  font-size: var(--text-xl);
+  color: var(--gold);
+  padding-top: var(--space-6);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+}

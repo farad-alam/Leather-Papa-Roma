@@ -1,0 +1,12 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #0f0e0d;
+}
+
+.main {
+  flex: 1;
+  background: #f5f3f0;
+  overflow-y: auto;
+  min-height: 100vh;
+}

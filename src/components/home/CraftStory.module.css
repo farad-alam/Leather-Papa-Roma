@@ -1,0 +1,137 @@
+.section {
+  background: var(--parchment);
+  overflow: hidden;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-16);
+  align-items: center;
+}
+
+/* ─── Image side ─────────────────────────────────────────── */
+.imageCol {
+  position: relative;
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.img {
+  object-fit: cover;
+  transition: transform 8s ease;
+}
+
+.imageWrap:hover .img {
+  transform: scale(1.03);
+}
+
+/* Floating stat card */
+.statCard {
+  position: absolute;
+  bottom: -var(--space-6);
+  right: -var(--space-8);
+  background: var(--cognac);
+  color: var(--ivory);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 100px;
+  transform: translate(1.5rem, 1.5rem);
+}
+
+.statCardValue {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.statCardLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.85;
+}
+
+/* ─── Text side ──────────────────────────────────────────── */
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.title {
+  font-size: clamp(var(--text-3xl), 3.5vw, var(--text-5xl));
+}
+
+.title em {
+  font-style: italic;
+  color: var(--cognac);
+}
+
+.body {
+  color: var(--text-secondary);
+  line-height: 1.75;
+  font-size: var(--text-base);
+  max-width: 55ch;
+}
+
+/* ─── Stats strip ────────────────────────────────────────── */
+.stats {
+  display: flex;
+  gap: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 500;
+  color: var(--cognac);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--warm-grey);
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+  .imageWrap {
+    aspect-ratio: 16 / 9;
+    max-height: 420px;
+  }
+  .statCard {
+    bottom: auto;
+    top: var(--space-4);
+    right: var(--space-4);
+    transform: none;
+  }
+}

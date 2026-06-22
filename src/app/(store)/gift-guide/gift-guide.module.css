@@ -1,0 +1,130 @@
+.page {
+  min-height: 100vh;
+  padding-bottom: var(--space-24);
+}
+
+.hero {
+  position: relative;
+  height: 60vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--ivory);
+  margin-bottom: var(--space-16);
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(26, 18, 9, 0.6), rgba(26, 18, 9, 0.8));
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  padding-top: var(--navbar-height);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-4xl), 6vw, 6rem);
+  line-height: 1.1;
+  animation: fadeInUp 0.6s ease;
+}
+
+.title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.subtitle {
+  font-size: var(--text-lg);
+  color: rgba(250, 246, 240, 0.8);
+  max-width: 50ch;
+  line-height: 1.6;
+  animation: fadeInUp 0.6s 0.2s ease backwards;
+}
+
+/* ─── Sections ───────────────────────────────────────────── */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  color: var(--ink);
+}
+
+.sectionDesc {
+  color: var(--text-secondary);
+  max-width: 45ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+/* ─── Help Box ───────────────────────────────────────────── */
+.helpBox {
+  margin-top: var(--space-20);
+  background: var(--parchment);
+  border: 1px dashed var(--gold);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.helpBox h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--ink);
+}
+
+.helpBox p {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+}

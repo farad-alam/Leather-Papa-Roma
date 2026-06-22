@@ -1,0 +1,158 @@
+.section {
+  background: var(--bg-primary);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+}
+
+/* ─── Carousel ───────────────────────────────────────────── */
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+/* ─── Nav buttons ────────────────────────────────────────── */
+.navBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-size: var(--text-xl);
+  color: var(--warm-grey);
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.navBtn:hover {
+  border-color: var(--cognac);
+  color: var(--cognac);
+  background: rgba(139, 69, 19, 0.05);
+}
+
+/* ─── Card ───────────────────────────────────────────────── */
+.card {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.4s ease;
+}
+
+/* ─── Stars ──────────────────────────────────────────────── */
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  font-size: var(--text-xl);
+  color: var(--gold);
+  line-height: 1;
+}
+
+/* ─── Quote ──────────────────────────────────────────────── */
+.quote {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.65;
+  border-left: 3px solid var(--gold);
+  padding-left: var(--space-5);
+  margin: 0;
+}
+
+/* ─── Author ─────────────────────────────────────────────── */
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.authorInitial {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--cognac);
+  color: var(--ivory);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-style: italic;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.authorName {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.authorProduct {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.verifiedBadge {
+  margin-left: auto;
+}
+
+/* ─── Dots ───────────────────────────────────────────────── */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--parchment-dark);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.activeDot {
+  background: var(--cognac);
+  width: 24px;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .carousel { gap: var(--space-3); }
+  .card { padding: var(--space-6); }
+  .navBtn { width: 36px; height: 36px; font-size: var(--text-base); }
+  .verifiedBadge { display: none; }
+}

@@ -1,0 +1,118 @@
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #1a1209;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.brand {
+  padding: 1.5rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.brandMain {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: #faf6f0;
+}
+
+.brandSub {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c9a96e;
+  font-family: var(--font-body);
+}
+
+.nav {
+  flex: 1;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: rgba(250, 246, 240, 0.65);
+  text-decoration: none;
+  transition: all 150ms ease;
+  font-family: var(--font-body);
+}
+
+.navItem:hover {
+  background: rgba(255,255,255,0.06);
+  color: #faf6f0;
+}
+
+.navItem.active {
+  background: rgba(139, 69, 19, 0.3);
+  color: #c9a96e;
+  font-weight: 500;
+}
+
+.navIcon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.footer {
+  padding: 1rem 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.viewSite {
+  display: block;
+  font-size: 0.8125rem;
+  color: rgba(250, 246, 240, 0.4);
+  text-decoration: none;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  transition: all 150ms ease;
+  font-family: var(--font-body);
+}
+
+.viewSite:hover {
+  color: rgba(250, 246, 240, 0.8);
+  background: rgba(255,255,255,0.05);
+}
+
+.logoutBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.8125rem;
+  color: rgba(250, 246, 240, 0.35);
+  cursor: pointer;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  text-align: left;
+  transition: all 150ms ease;
+  font-family: var(--font-body);
+}
+
+.logoutBtn:hover {
+  color: rgba(192, 57, 43, 0.8);
+  background: rgba(192, 57, 43, 0.08);
+}
