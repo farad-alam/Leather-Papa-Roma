@@ -1,27 +1,46 @@
-.hero {
+/* ─── Layout ─────────────────────────────────────────── */
+.heroWrapper {
   position: relative;
-  height: 100dvh;
+  height: 300vh; /* Scroll container height */
+  background-color: var(--ink); /* Fallback background */
+}
+
+.stickyContainer {
+  position: sticky;
+  top: 0;
+  height: 100vh;
   min-height: 600px;
+  width: 100%;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  overflow: hidden;
   color: var(--ivory);
 }
 
-/* ─── Background ─────────────────────────────────────────── */
-.bg {
+/* ─── Canvas & Background ────────────────────────────────── */
+.canvas {
   position: absolute;
-  inset: -10%; /* Negative inset to allow for parallax movement without showing edges */
-  width: 120%;
-  height: 120%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   z-index: 0;
-  will-change: transform; /* Hint for performance */
+  will-change: contents;
+}
+
+.staticBg {
+  display: none; /* Hidden on desktop */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 .bgImg {
   object-fit: cover;
   object-position: center;
-  /* Slight initial zoom-out effect handled by Framer Motion's scale in component, but we keep this static */
 }
 
 .overlay {
@@ -33,6 +52,34 @@
     rgba(26, 18, 9, 0.45) 0%,
     rgba(26, 18, 9, 0.75) 100%
   );
+}
+
+/* ─── Loader ─────────────────────────────────────────────── */
+.loader {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  color: var(--ivory);
+  transition: opacity 0.5s ease;
+}
+
+.loaderSpinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ─── Content ────────────────────────────────────────────── */
@@ -143,7 +190,25 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  /* On mobile, disable the 300vh scroll and use static fallback */
+  .heroWrapper {
+    height: auto;
+  }
+  
+  .stickyContainer {
+    position: relative;
+    height: 100dvh;
+  }
+  
+  .canvas {
+    display: none;
+  }
+  
+  .staticBg {
+    display: block;
+  }
+  
   .inner { padding-block: var(--space-12); }
   .ctas  { flex-direction: column; }
   .trust { gap: var(--space-4); }
