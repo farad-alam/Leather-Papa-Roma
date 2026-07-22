@@ -1,53 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import styles from "./HeroSection.module.css";
 
 const FRAME_COUNT = 285;
-const FRAME_URL = (index: number) => 
+const FRAME_URL = (index: number) =>
   `/Hero%20Scroll%20animation%20images/ezgif-frame-${index.toString().padStart(3, "0")}.jpg`;
 
 export default function HeroSection() {
   const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to order a leather product.")}`;
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  // State for image preloading
+  const loaderRef = useRef<HTMLDivElement>(null);
+  const loaderTextRef = useRef<HTMLSpanElement>(null);
+
+  // Store images and mobile flag in refs — NEVER in state — to avoid re-renders
   const imagesRef = useRef<HTMLImageElement[]>([]);
-  const [loadedCount, setLoadedCount] = useState(0);
-  const [isReady, setIsReady] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Preload images
-  useEffect(() => {
-    // Check if mobile on mount
-    const checkMobile = () => window.innerWidth <= 768;
-    setIsMobile(checkMobile());
-    if (checkMobile()) return; // Skip heavy preload on mobile
-
-    let loaded = 0;
-    const images: HTMLImageElement[] = [];
-
-    // Preload all frames
-    for (let i = 1; i <= FRAME_COUNT; i++) {
-      const img = new window.Image();
-      img.src = FRAME_URL(i);
-      img.onload = () => {
-        loaded++;
-        setLoadedCount(loaded);
-        if (loaded > 10) {
-          // We can start once we have the first few frames
-          setIsReady(true);
-        }
-      };
-      images.push(img);
-    }
-    imagesRef.current = images;
-  }, []);
+  const isMobileRef = useRef(false);
 
   // Scroll tracking
   const { scrollYProgress } = useScroll({
@@ -55,73 +28,90 @@ export default function HeroSection() {
     offset: ["start start", "end end"],
   });
 
-  // Render to canvas
+  // Text fades out as scroll begins (0 → 15%)
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0], { clamp: true });
+  const headerY      = useTransform(scrollYProgress, [0, 0.15], [0, -30], { clamp: true });
+
+  // CTAs fade in near the end (70% → 85%)
+  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1], { clamp: true });
+  const ctaY       = useTransform(scrollYProgress, [0.7, 0.85], [30, 0], { clamp: true });
+
+  // Scroll indicator fades out immediately
+  const indicatorOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0], { clamp: true });
+
+  // Canvas draw — completely outside React render cycle
   const renderFrame = (index: number) => {
     const canvas = canvasRef.current;
     const img = imagesRef.current[index];
-    if (canvas && img && img.complete) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        // Adjust for device pixel ratio for retina screens
-        const dpr = window.devicePixelRatio || 1;
-        
-        // Only set canvas dimensions if they've changed to avoid clearing
-        const rect = canvas.getBoundingClientRect();
-        if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
-           canvas.width = rect.width * dpr;
-           canvas.height = rect.height * dpr;
-           ctx.scale(dpr, dpr);
-        }
+    if (!canvas || !img || !img.complete) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-        // Draw image keeping aspect ratio (object-fit: contain equivalent)
-        const hRatio = rect.width / img.width;
-        const vRatio = rect.height / img.height;
-        const ratio = Math.min(hRatio, vRatio);
-        const centerShift_x = (rect.width - img.width * ratio) / 2;
-        const centerShift_y = (rect.height - img.height * ratio) / 2;
-
-        ctx.clearRect(0, 0, rect.width, rect.height);
-        ctx.drawImage(img, 0, 0, img.width, img.height,
-          centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
-      }
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    if (canvas.width !== rect.width * dpr || canvas.height !== rect.height * dpr) {
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
     }
+
+    const hRatio = rect.width / img.width;
+    const vRatio = rect.height / img.height;
+    const ratio = Math.min(hRatio, vRatio);
+    const sx = (rect.width - img.width * ratio) / 2;
+    const sy = (rect.height - img.height * ratio) / 2;
+
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.drawImage(img, 0, 0, img.width, img.height, sx, sy, img.width * ratio, img.height * ratio);
   };
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (isMobile) return;
-    // Map progress 0-1 to frame index 0-284
-    const frameIndex = Math.min(
-      FRAME_COUNT - 1,
-      Math.max(0, Math.floor(latest * FRAME_COUNT))
-    );
+    if (isMobileRef.current) return;
+    const frameIndex = Math.min(FRAME_COUNT - 1, Math.max(0, Math.floor(latest * FRAME_COUNT)));
     requestAnimationFrame(() => renderFrame(frameIndex));
   });
 
-  // Initial draw once ready
+  // Preload images — use refs for loader text, never setState
   useEffect(() => {
-    if (isReady && !isMobile) {
-      renderFrame(0);
+    isMobileRef.current = window.innerWidth <= 768;
+    if (isMobileRef.current) return;
+
+    let loaded = 0;
+    const images: HTMLImageElement[] = [];
+
+    for (let i = 1; i <= FRAME_COUNT; i++) {
+      const img = new window.Image();
+      img.src = FRAME_URL(i);
+      img.onload = () => {
+        loaded++;
+        // Update loader text via DOM ref — no re-render triggered
+        if (loaderTextRef.current) {
+          loaderTextRef.current.textContent = `Loading experience... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
+        }
+        if (loaded === 10) {
+          renderFrame(0);
+        }
+        if (loaded >= FRAME_COUNT) {
+          // Hide loader via DOM ref — no re-render triggered
+          if (loaderRef.current) {
+            loaderRef.current.style.opacity = "0";
+            loaderRef.current.style.pointerEvents = "none";
+          }
+        }
+      };
+      images.push(img);
     }
-  }, [isReady, isMobile]);
-
-
-  // The Cinematic Fade Approach
-  // Kicker, Headline, and Subtext start visible and fade out as scroll starts
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0], { clamp: true });
-  const headerY = useTransform(scrollYProgress, [0, 0.15], [0, -30], { clamp: true });
-
-  // CTAs and Trust Badges fade in near the end of the scroll
-  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1], { clamp: true });
-  const ctaY = useTransform(scrollYProgress, [0.7, 0.85], [30, 0], { clamp: true });
+    imagesRef.current = images;
+  }, []);
 
   return (
     <section ref={containerRef} className={styles.heroWrapper} aria-label="Hero">
       <div className={styles.stickyContainer}>
-        
-        {/* Canvas for Desktop */}
+
+        {/* Canvas — desktop only (hidden on mobile via CSS) */}
         <canvas ref={canvasRef} className={styles.canvas} />
 
-        {/* Fallback Static Image for Mobile */}
+        {/* Static fallback — mobile only (hidden on desktop via CSS) */}
         <div className={styles.staticBg}>
           <Image
             src="/hero.png"
@@ -132,49 +122,36 @@ export default function HeroSection() {
             className={styles.bgImg}
           />
         </div>
-        
+
         <div className={styles.overlay} />
 
-        {/* Loader Overlay (desktop only) */}
-        {!isMobile && !isReady && (
-          <div className={styles.loader}>
-            <div className={styles.loaderSpinner} />
-            <span>Loading experience... {Math.round((loadedCount / FRAME_COUNT) * 100)}%</span>
-          </div>
-        )}
+        {/* Loader — controlled via DOM ref, not React state */}
+        <div ref={loaderRef} className={styles.loader}>
+          <div className={styles.loaderSpinner} />
+          <span ref={loaderTextRef}>Loading experience... 0%</span>
+        </div>
 
         {/* Content */}
         <div className={styles.content}>
           <div className={styles.inner}>
-            
-            <motion.div
-              style={isMobile ? undefined : { opacity: headerOpacity, y: headerY, pointerEvents: useTransform(headerOpacity, v => v === 0 ? "none" : "auto") }}
-              initial={isMobile ? { opacity: 0, y: 30 } : false}
-              animate={isMobile ? { opacity: 1, y: 0 } : false}
-              transition={{ duration: 0.8 }}
-            >
+
+            {/* Header text: always uses scroll-driven MotionValue */}
+            <motion.div style={{ opacity: headerOpacity, y: headerY }}>
               <span className={styles.kicker}>
                 Full-Grain Leather · Handcrafted in Bangladesh
               </span>
-
               <h1 className={styles.headline}>
                 <span style={{ display: "block" }}>Crafted to Last.</span>
                 <em style={{ display: "block" }}>Signed by You.</em>
               </h1>
-
               <p className={styles.sub}>
                 Premium leather wallets, cardholders, belts &amp; diary covers —
                 with optional custom embossing for a personal touch.
               </p>
             </motion.div>
 
-            <motion.div 
-              className={styles.ctas}
-              style={{ opacity: isMobile ? 1 : ctaOpacity, y: isMobile ? 0 : ctaY }}
-              initial={isMobile ? { opacity: 0, y: 30 } : false}
-              animate={isMobile ? { opacity: 1, y: 0 } : false}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
+            {/* CTAs: always uses scroll-driven MotionValue */}
+            <motion.div className={styles.ctas} style={{ opacity: ctaOpacity, y: ctaY }}>
               <Link href="/shop" className="btn btn-primary btn-lg">
                 Shop Collection
               </Link>
@@ -188,14 +165,8 @@ export default function HeroSection() {
               </a>
             </motion.div>
 
-            {/* Trust strip (fades in with CTAs) */}
-            <motion.div 
-              className={styles.trust}
-              style={{ opacity: isMobile ? 1 : ctaOpacity, y: isMobile ? 0 : ctaY }}
-              initial={isMobile ? { opacity: 0, y: 30 } : false}
-              animate={isMobile ? { opacity: 1, y: 0 } : false}
-              transition={{ duration: 0.8, delay: 0.5 }}
-            >
+            {/* Trust strip */}
+            <motion.div className={styles.trust} style={{ opacity: ctaOpacity, y: ctaY }}>
               {["100% Full-Grain Leather", "Custom Embossing Available", "Ships Across Bangladesh"].map(
                 (item) => (
                   <span key={item} className={styles.trustItem}>
@@ -208,11 +179,11 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Scroll indicator (fades out slightly on scroll) */}
+        {/* Scroll indicator */}
         <motion.div
           className={styles.scrollIndicator}
           aria-hidden="true"
-          style={{ opacity: useTransform(scrollYProgress, [0, 0.1], [1, 0]) }}
+          style={{ opacity: indicatorOpacity }}
         >
           <div className={styles.scrollLine} />
           <span className={styles.scrollLabel}>Scroll</span>
