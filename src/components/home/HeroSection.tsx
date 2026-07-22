@@ -107,12 +107,12 @@ export default function HeroSection() {
 
   // The Cinematic Fade Approach
   // Kicker, Headline, and Subtext start visible and fade out as scroll starts
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const headerY = useTransform(scrollYProgress, [0, 0.15], [0, -30]);
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0], { clamp: true });
+  const headerY = useTransform(scrollYProgress, [0, 0.15], [0, -30], { clamp: true });
 
   // CTAs and Trust Badges fade in near the end of the scroll
-  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1]);
-  const ctaY = useTransform(scrollYProgress, [0.7, 0.85], [30, 0]);
+  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1], { clamp: true });
+  const ctaY = useTransform(scrollYProgress, [0.7, 0.85], [30, 0], { clamp: true });
 
   return (
     <section ref={containerRef} className={styles.heroWrapper} aria-label="Hero">
