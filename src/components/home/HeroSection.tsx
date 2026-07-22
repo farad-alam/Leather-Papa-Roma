@@ -73,10 +73,10 @@ export default function HeroSection() {
            ctx.scale(dpr, dpr);
         }
 
-        // Draw image covering the canvas (object-fit: cover equivalent in canvas)
+        // Draw image keeping aspect ratio (object-fit: contain equivalent)
         const hRatio = rect.width / img.width;
         const vRatio = rect.height / img.height;
-        const ratio = Math.max(hRatio, vRatio);
+        const ratio = Math.min(hRatio, vRatio);
         const centerShift_x = (rect.width - img.width * ratio) / 2;
         const centerShift_y = (rect.height - img.height * ratio) / 2;
 

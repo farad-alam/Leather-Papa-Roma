@@ -25,10 +25,15 @@ export default function Navbar() {
   const isHeroPage = pathname === "/";
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
+    const handleScroll = () => {
+      // 300vh hero section on homepage, 60px threshold elsewhere.
+      const threshold = isHeroPage ? window.innerHeight * 2.8 : 60;
+      setScrolled(window.scrollY > threshold);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Check on mount
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHeroPage]);
 
   useEffect(() => {
     if (menuOpen) document.body.style.overflow = "hidden";
