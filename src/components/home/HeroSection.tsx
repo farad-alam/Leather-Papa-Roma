@@ -147,45 +147,26 @@ export default function HeroSection() {
         <div className={styles.content}>
           <div className={styles.inner}>
             
-            <motion.span 
-              className={styles.kicker}
-              style={{ opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
+            <motion.div
+              style={isMobile ? undefined : { opacity: headerOpacity, y: headerY, pointerEvents: useTransform(headerOpacity, v => v === 0 ? "none" : "auto") }}
               initial={isMobile ? { opacity: 0, y: 30 } : false}
               animate={isMobile ? { opacity: 1, y: 0 } : false}
               transition={{ duration: 0.8 }}
             >
-              Full-Grain Leather · Handcrafted in Bangladesh
-            </motion.span>
+              <span className={styles.kicker}>
+                Full-Grain Leather · Handcrafted in Bangladesh
+              </span>
 
-            <h1 className={styles.headline}>
-              <motion.span 
-                style={{ display: "block", opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
-                initial={isMobile ? { opacity: 0, y: 30 } : false}
-                animate={isMobile ? { opacity: 1, y: 0 } : false}
-                transition={{ duration: 0.8, delay: 0.1 }}
-              >
-                Crafted to Last.
-              </motion.span>
-              <motion.em 
-                style={{ display: "block", opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
-                initial={isMobile ? { opacity: 0, y: 30 } : false}
-                animate={isMobile ? { opacity: 1, y: 0 } : false}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                Signed by You.
-              </motion.em>
-            </h1>
+              <h1 className={styles.headline}>
+                <span style={{ display: "block" }}>Crafted to Last.</span>
+                <em style={{ display: "block" }}>Signed by You.</em>
+              </h1>
 
-            <motion.p 
-              className={styles.sub}
-              style={{ opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
-              initial={isMobile ? { opacity: 0, y: 30 } : false}
-              animate={isMobile ? { opacity: 1, y: 0 } : false}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
-              Premium leather wallets, cardholders, belts &amp; diary covers —
-              with optional custom embossing for a personal touch.
-            </motion.p>
+              <p className={styles.sub}>
+                Premium leather wallets, cardholders, belts &amp; diary covers —
+                with optional custom embossing for a personal touch.
+              </p>
+            </motion.div>
 
             <motion.div 
               className={styles.ctas}
