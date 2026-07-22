@@ -105,22 +105,14 @@ export default function HeroSection() {
   }, [isReady, isMobile]);
 
 
-  // Progressive fade-in animations mapped to scrollYProgress
-  // Kicker fades in 10% - 20%
-  const kickerOpacity = useTransform(scrollYProgress, [0.1, 0.2], [0, 1]);
-  const kickerY = useTransform(scrollYProgress, [0.1, 0.2], [30, 0]);
+  // The Cinematic Fade Approach
+  // Kicker, Headline, and Subtext start visible and fade out as scroll starts
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+  const headerY = useTransform(scrollYProgress, [0, 0.15], [0, -30]);
 
-  // Headline fades in 30% - 40%
-  const headlineOpacity = useTransform(scrollYProgress, [0.3, 0.4], [0, 1]);
-  const headlineY = useTransform(scrollYProgress, [0.3, 0.4], [30, 0]);
-
-  // Subtext fades in 50% - 60%
-  const subOpacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
-  const subY = useTransform(scrollYProgress, [0.5, 0.6], [30, 0]);
-
-  // CTAs fade in 70% - 80%
-  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.8], [0, 1]);
-  const ctaY = useTransform(scrollYProgress, [0.7, 0.8], [30, 0]);
+  // CTAs and Trust Badges fade in near the end of the scroll
+  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1]);
+  const ctaY = useTransform(scrollYProgress, [0.7, 0.85], [30, 0]);
 
   return (
     <section ref={containerRef} className={styles.heroWrapper} aria-label="Hero">
@@ -157,7 +149,7 @@ export default function HeroSection() {
             
             <motion.span 
               className={styles.kicker}
-              style={{ opacity: isMobile ? 1 : kickerOpacity, y: isMobile ? 0 : kickerY }}
+              style={{ opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
               initial={isMobile ? { opacity: 0, y: 30 } : false}
               animate={isMobile ? { opacity: 1, y: 0 } : false}
               transition={{ duration: 0.8 }}
@@ -167,7 +159,7 @@ export default function HeroSection() {
 
             <h1 className={styles.headline}>
               <motion.span 
-                style={{ display: "block", opacity: isMobile ? 1 : headlineOpacity, y: isMobile ? 0 : headlineY }}
+                style={{ display: "block", opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
                 initial={isMobile ? { opacity: 0, y: 30 } : false}
                 animate={isMobile ? { opacity: 1, y: 0 } : false}
                 transition={{ duration: 0.8, delay: 0.1 }}
@@ -175,7 +167,7 @@ export default function HeroSection() {
                 Crafted to Last.
               </motion.span>
               <motion.em 
-                style={{ display: "block", opacity: isMobile ? 1 : headlineOpacity, y: isMobile ? 0 : headlineY }}
+                style={{ display: "block", opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
                 initial={isMobile ? { opacity: 0, y: 30 } : false}
                 animate={isMobile ? { opacity: 1, y: 0 } : false}
                 transition={{ duration: 0.8, delay: 0.2 }}
@@ -186,7 +178,7 @@ export default function HeroSection() {
 
             <motion.p 
               className={styles.sub}
-              style={{ opacity: isMobile ? 1 : subOpacity, y: isMobile ? 0 : subY }}
+              style={{ opacity: isMobile ? 1 : headerOpacity, y: isMobile ? 0 : headerY }}
               initial={isMobile ? { opacity: 0, y: 30 } : false}
               animate={isMobile ? { opacity: 1, y: 0 } : false}
               transition={{ duration: 0.8, delay: 0.3 }}
