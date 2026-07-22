@@ -1,78 +1,109 @@
 .section {
-  background: var(--parchment);
-  overflow: hidden;
+  background-color: var(--bg-primary);
+  position: relative;
+  /* Extra padding to allow for scrolling the narrative panels */
+  padding-bottom: clamp(var(--space-20), 10vw, var(--space-32));
 }
 
 .inner {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-16);
-  align-items: center;
+  gap: clamp(var(--space-8), 6vw, var(--space-20));
+  align-items: start; /* Important for sticky to work */
 }
 
-/* ─── Image side ─────────────────────────────────────────── */
+/* ─── Left Col: Sticky Image ─────────────────────────────────────── */
 .imageCol {
   position: relative;
+  height: 100%; /* Fill the grid track so sticky has room to travel */
+}
+
+.stickyWrap {
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--space-8));
+  height: calc(100vh - var(--navbar-height) - var(--space-16));
+  max-height: 700px;
+  min-height: 400px;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-secondary);
 }
 
 .imageWrap {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  position: absolute;
+  inset: 0;
 }
 
 .img {
   object-fit: cover;
-  transition: transform 8s ease;
 }
 
-.imageWrap:hover .img {
-  transform: scale(1.03);
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 60%,
+    rgba(26, 18, 9, 0.4) 100%
+  );
 }
 
-/* Floating stat card */
+/* Stat Card Overlay */
 .statCard {
   position: absolute;
-  bottom: -var(--space-6);
-  right: -var(--space-8);
-  background: var(--cognac);
-  color: var(--ivory);
-  padding: var(--space-5) var(--space-6);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  bottom: var(--space-6);
+  right: var(--space-6);
+  background: var(--white);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  min-width: 100px;
-  transform: translate(1.5rem, 1.5rem);
+  align-items: flex-end;
+  color: var(--text-primary);
+  min-width: 160px;
 }
 
 .statCardValue {
   font-family: var(--font-display);
-  font-size: var(--text-3xl);
-  font-weight: 600;
+  font-size: var(--text-4xl);
+  font-weight: 500;
   line-height: 1;
+  color: var(--cognac);
 }
 
 .statCardLabel {
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  opacity: 0.85;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
 }
 
-/* ─── Text side ──────────────────────────────────────────── */
+/* ─── Right Col: Narrative ───────────────────────────────────────── */
 .textCol {
+  padding-top: var(--space-10);
+  /* The padding-bottom ensures the last panel can scroll into the center */
+  padding-bottom: 50vh; 
+}
+
+.panelsWrap {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: 40vh; /* Massive gap to force user to scroll between panels */
+  margin-top: var(--space-10);
+}
+
+.panel {
+  transition: opacity 0.4s ease;
 }
 
 .title {
-  font-size: clamp(var(--text-3xl), 3.5vw, var(--text-5xl));
+  font-size: var(--text-5xl);
+  margin-bottom: var(--space-6);
+  color: var(--ink);
 }
 
 .title em {
@@ -81,57 +112,39 @@
 }
 
 .body {
+  font-size: var(--text-lg);
+  line-height: 1.8;
   color: var(--text-secondary);
-  line-height: 1.75;
-  font-size: var(--text-base);
-  max-width: 55ch;
-}
-
-/* ─── Stats strip ────────────────────────────────────────── */
-.stats {
-  display: flex;
-  gap: var(--space-8);
-  padding-top: var(--space-6);
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.statValue {
-  font-family: var(--font-display);
-  font-size: var(--text-3xl);
-  font-weight: 500;
-  color: var(--cognac);
-  line-height: 1;
-}
-
-.statLabel {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--warm-grey);
+  max-width: 48ch;
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .inner {
     grid-template-columns: 1fr;
-    gap: var(--space-10);
+    gap: var(--space-12);
   }
-  .imageWrap {
-    aspect-ratio: 16 / 9;
-    max-height: 420px;
+
+  .imageCol {
+    height: 60vh;
   }
-  .statCard {
-    bottom: auto;
-    top: var(--space-4);
-    right: var(--space-4);
-    transform: none;
+
+  .stickyWrap {
+    position: relative; /* Disable sticky on mobile */
+    top: 0;
+    height: 100%;
+  }
+
+  .textCol {
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  .panelsWrap {
+    gap: var(--space-16); /* Reduce gap on mobile */
+  }
+
+  .panel {
+    opacity: 1 !important; /* Always visible on mobile */
   }
 }

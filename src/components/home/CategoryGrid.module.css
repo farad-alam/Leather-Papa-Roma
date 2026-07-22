@@ -1,131 +1,140 @@
 .section {
-  background: var(--bg-secondary);
+  background-color: var(--bg-primary);
 }
 
 .header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin-bottom: var(--space-10);
+  margin-bottom: var(--space-12);
+  text-align: center;
 }
 
 .title {
-  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
-  max-width: 20ch;
+  margin-top: var(--space-4);
 }
 
-/* ─── Asymmetric grid ──────────────────────────────────── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 360px 280px;
-  gap: var(--space-3);
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
 }
 
-/* Large card spans 2 rows */
-.card.large {
-  grid-column: 1 / 2;
-  grid-row: 1 / 3;
+/* ─── Card Structure ────────────────────────────────────────────── */
+.cardWrapper {
+  perspective: 1000px; /* Essential for 3D effect */
+  display: block;
 }
 
-/* Small cards */
-.card.small { grid-column: span 1; }
+/* Grid Spans */
+.large { grid-column: span 12; aspect-ratio: 21/9; }
+.medium { grid-column: span 6; aspect-ratio: 4/3; }
+.small { grid-column: span 4; aspect-ratio: 1/1; }
 
-/* Medium cards */
-.card.medium { grid-column: span 1; }
-
-/* ─── Card ─────────────────────────────────────────────── */
 .card {
   position: relative;
+  width: 100%;
+  height: 100%;
   display: block;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  cursor: pointer;
-  text-decoration: none;
+  transform-style: preserve-3d; /* Keep child 3D transforms */
+  box-shadow: var(--shadow);
+  background: var(--bg-secondary);
+}
+
+.imgWrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Pull back slightly on Z axis for parallax depth between img and text */
+  transform: translateZ(-20px) scale(1.05);
 }
 
 .img {
   object-fit: cover;
-  transition: transform 600ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .card:hover .img {
-  transform: scale(1.06);
+  transform: scale(1.1); /* Image zooms while card tilts */
 }
 
+/* ─── Overlay & Text ────────────────────────────────────────────── */
 .cardOverlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(26, 18, 9, 0.75) 0%,
+    rgba(26, 18, 9, 0.8) 0%,
     rgba(26, 18, 9, 0.1) 50%,
     transparent 100%
   );
-  transition: opacity var(--transition);
+  transition: opacity 0.4s ease;
 }
 
-.card:hover .cardOverlay {
-  opacity: 0.9;
+.countBadge {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  color: var(--white);
+  padding: 0.25rem 0.75rem;
+  font-size: var(--text-xs);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transform: translateZ(20px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .countBadge {
+  opacity: 1;
 }
 
 .cardLabel {
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
-  padding: var(--space-5) var(--space-6);
+  width: 100%;
+  padding: var(--space-6);
   display: flex;
-  align-items: flex-end;
   justify-content: space-between;
-  z-index: 1;
+  align-items: center;
+  color: var(--ivory);
+  transform: translateZ(30px); /* Push text forward in 3D space */
 }
 
 .cardName {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
-  font-style: italic;
-  color: var(--ivory);
-  font-weight: 400;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
-}
-
-.card.large .cardName {
-  font-size: var(--text-3xl);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .cardArrow {
   font-size: var(--text-xl);
-  color: var(--gold);
-  transition: transform var(--transition);
   opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .card:hover .cardArrow {
   opacity: 1;
-  transform: translateX(4px);
+  transform: translateX(0);
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: 300px 220px 220px;
-  }
-  .card.large {
-    grid-column: 1 / -1;
-    grid-row: 1 / 2;
-  }
+  .small { grid-column: span 6; aspect-ratio: 4/3; }
 }
 
 @media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+  .large, .medium, .small { 
+    grid-column: span 12; 
+    aspect-ratio: 4/3; 
   }
-  .card {
-    height: 220px;
-    grid-column: 1 / -1 !important;
-    grid-row: auto !important;
-  }
+  
+  /* Disable 3D tilt on mobile for performance/UX */
+  .cardWrapper { perspective: none; }
+  .card { transform: none !important; }
 }

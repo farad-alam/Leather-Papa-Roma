@@ -1,14 +1,45 @@
+"use client";
+
+import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
 import styles from "./HeroSection.module.css";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const fadeUpAnim = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
 
 export default function HeroSection() {
   const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to order a leather product.")}`;
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Parallax effect on scroll
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+  
+  // Move image down slightly as user scrolls down for parallax depth
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
 
   return (
-    <section className={styles.hero} aria-label="Hero">
-      {/* Background image */}
-      <div className={styles.bg}>
+    <section ref={containerRef} className={styles.hero} aria-label="Hero">
+      {/* Background image with parallax */}
+      <motion.div className={styles.bg} style={{ y, scale }}>
         <Image
           src="/hero.png"
           alt="Premium full-grain leather goods by Papa Roma Leather"
@@ -17,25 +48,32 @@ export default function HeroSection() {
           sizes="100vw"
           className={styles.bgImg}
         />
-        <div className={styles.overlay} />
-      </div>
+      </motion.div>
+      <div className={styles.overlay} />
 
       {/* Content */}
       <div className={styles.content}>
-        <div className={styles.inner}>
-          <span className={styles.kicker}>Full-Grain Leather · Handcrafted in Bangladesh</span>
+        <motion.div
+          className={styles.inner}
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.span variants={fadeUpAnim} className={styles.kicker}>
+            Full-Grain Leather · Handcrafted in Bangladesh
+          </motion.span>
 
           <h1 className={styles.headline}>
-            Crafted to Last.<br />
-            <em>Signed by You.</em>
+            <motion.span variants={fadeUpAnim} style={{ display: "block" }}>Crafted to Last.</motion.span>
+            <motion.em variants={fadeUpAnim} style={{ display: "block" }}>Signed by You.</motion.em>
           </h1>
 
-          <p className={styles.sub}>
+          <motion.p variants={fadeUpAnim} className={styles.sub}>
             Premium leather wallets, cardholders, belts &amp; diary covers —
             with optional custom embossing for a personal touch.
-          </p>
+          </motion.p>
 
-          <div className={styles.ctas}>
+          <motion.div variants={fadeUpAnim} className={styles.ctas}>
             <Link href="/shop" className="btn btn-primary btn-lg">
               Shop Collection
             </Link>
@@ -47,10 +85,10 @@ export default function HeroSection() {
             >
               <WhatsAppIcon /> Order via WhatsApp
             </a>
-          </div>
+          </motion.div>
 
           {/* Trust strip */}
-          <div className={styles.trust}>
+          <motion.div variants={fadeUpAnim} className={styles.trust}>
             {["100% Full-Grain Leather", "Custom Embossing Available", "Ships Across Bangladesh"].map(
               (item) => (
                 <span key={item} className={styles.trustItem}>
@@ -58,15 +96,21 @@ export default function HeroSection() {
                 </span>
               )
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}
-      <div className={styles.scrollIndicator} aria-hidden="true">
+      <motion.div
+        className={styles.scrollIndicator}
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 1 }}
+      >
         <div className={styles.scrollLine} />
         <span className={styles.scrollLabel}>Scroll</span>
-      </div>
+      </motion.div>
     </section>
   );
 }

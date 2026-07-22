@@ -1,109 +1,127 @@
 .section {
-  background: var(--ink);
+  background: var(--ink); /* Deep dark background */
   color: var(--ivory);
-  padding-block: clamp(var(--space-16), 8vw, var(--space-32));
+  padding-block: clamp(var(--space-16), 10vw, var(--space-32));
   position: relative;
   overflow: hidden;
 }
 
-/* Decorative background texture */
-.section::before {
+/* Subtle gradient to give depth behind the noise */
+.section::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(ellipse at 70% 50%, rgba(139, 69, 19, 0.15) 0%, transparent 60%);
+  background: radial-gradient(
+    circle at 30% 50%,
+    rgba(139, 69, 19, 0.15) 0%,
+    transparent 60%
+  );
   pointer-events: none;
 }
 
 .inner {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 1.2fr;
   gap: var(--space-16);
   align-items: center;
   position: relative;
+  z-index: 2;
 }
 
-/* ─── Monogram preview ───────────────────────────────────── */
-.monogram {
+/* ─── Monogram Column ───────────────────────────────────────── */
+.monogramCol {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
+  justify-content: center;
+  gap: var(--space-8);
 }
 
-.monogramLetter {
+.monogram {
+  width: min(300px, 80vw);
+  aspect-ratio: 1;
+  background: var(--cognac-dark);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 180px;
-  height: 180px;
-  border: 2px solid var(--gold);
-  border-radius: var(--radius-xl);
-  font-family: var(--font-display);
-  font-size: 8rem;
-  font-style: italic;
-  color: var(--gold);
-  line-height: 1;
-  font-weight: 400;
-  background: rgba(201, 169, 110, 0.05);
-  box-shadow: inset 0 0 40px rgba(201, 169, 110, 0.08), 0 0 60px rgba(201, 169, 110, 0.05);
-  animation: monogramPulse 4s ease-in-out infinite;
+  /* Simulating pressed leather */
+  box-shadow: 
+    inset 4px 4px 12px rgba(0, 0, 0, 0.6),
+    inset -4px -4px 12px rgba(255, 255, 255, 0.05),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
 }
 
-@keyframes monogramPulse {
-  0%, 100% { box-shadow: inset 0 0 40px rgba(201, 169, 110, 0.08), 0 0 60px rgba(201, 169, 110, 0.05); }
-  50%       { box-shadow: inset 0 0 60px rgba(201, 169, 110, 0.14), 0 0 80px rgba(201, 169, 110, 0.10); }
+.monogram::before {
+  /* Subtle leather grain over the box */
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.monogramLetter {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 10vw, 7rem);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: var(--cognac-dark);
+  /* The "embossed" text effect */
+  text-shadow: 
+    -1px -1px 1px rgba(0, 0, 0, 0.8),
+    1px 1px 1px rgba(255, 255, 255, 0.2);
+  z-index: 1;
 }
 
 .monogramLabel {
-  font-size: var(--text-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--gold);
-  opacity: 0.7;
 }
 
 /* ─── Content ────────────────────────────────────────────── */
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
 }
 
 .kicker {
   font-size: var(--text-xs);
+  font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--gold);
+  margin-bottom: var(--space-4);
 }
 
 .title {
-  font-family: var(--font-display);
   font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
+  margin-bottom: var(--space-6);
   color: var(--ivory);
-  font-weight: 500;
-}
-
-.title em {
-  font-style: italic;
-  color: var(--gold-light);
 }
 
 .body {
-  color: rgba(250, 246, 240, 0.72);
-  line-height: 1.75;
-  max-width: 55ch;
+  font-size: var(--text-lg);
+  color: rgba(250, 246, 240, 0.7);
+  line-height: 1.7;
+  margin-bottom: var(--space-10);
+  max-width: 45ch;
 }
 
 /* ─── Steps ──────────────────────────────────────────────── */
 .steps {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(201, 169, 110, 0.2);
-  border-radius: var(--radius-lg);
+  gap: var(--space-6);
+  margin-bottom: var(--space-10);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding-left: var(--space-6);
 }
 
 .step {
@@ -114,15 +132,14 @@
 
 .stepNum {
   font-family: var(--font-display);
-  font-size: var(--text-2xl);
   font-style: italic;
+  font-size: var(--text-xl);
   color: var(--gold);
-  min-width: 2ch;
 }
 
 .stepLabel {
-  font-size: var(--text-sm);
-  color: rgba(250, 246, 240, 0.8);
+  font-size: var(--text-base);
+  color: var(--ivory);
 }
 
 /* ─── CTAs ───────────────────────────────────────────────── */
@@ -133,22 +150,13 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .inner {
     grid-template-columns: 1fr;
-    gap: var(--space-10);
+    gap: var(--space-12);
   }
-  .monogram {
-    flex-direction: row;
-    justify-content: center;
-  }
-  .monogramLetter {
-    width: 100px;
-    height: 100px;
-    font-size: 4.5rem;
-  }
-}
 
-@media (max-width: 640px) {
-  .ctas { flex-direction: column; }
+  .monogramCol {
+    order: -1;
+  }
 }
