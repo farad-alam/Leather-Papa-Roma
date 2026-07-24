@@ -1,5 +1,7 @@
 .section {
   background-color: var(--bg-primary);
+  overflow: hidden;
+  position: relative;
 }
 
 .header {
@@ -11,41 +13,50 @@
   margin-top: var(--space-4);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: var(--space-6);
+/* ─── Carousel Layout ────────────────────────────────────────────── */
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  padding-block: var(--space-8);
+  /* Allows cards to break out of container bounds on x axis slightly */
+  margin-inline: calc(var(--space-12) * -1);
+  padding-inline: var(--space-12);
+}
+
+.carouselInner {
+  position: relative;
+  width: 100%;
+  max-width: 340px; /* Reduced to fit side cards nicely on screen */
+  margin: 0 auto;
+  aspect-ratio: 3/4;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
 /* ─── Card Structure ────────────────────────────────────────────── */
 .cardWrapper {
-  perspective: 1000px; /* Essential for 3D effect */
-  display: block;
-}
-
-/* Grid Spans */
-.large { grid-column: span 12; aspect-ratio: 21/9; }
-.medium { grid-column: span 6; aspect-ratio: 4/3; }
-.small { grid-column: span 4; aspect-ratio: 1/1; }
-
-.card {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: block;
+  position: absolute;
+  inset: 0;
   border-radius: var(--radius-xl);
   overflow: hidden;
-  transform-style: preserve-3d; /* Keep child 3D transforms */
-  box-shadow: var(--shadow);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
   background: var(--bg-secondary);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.cardLink {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
 }
 
 .imgWrap {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  /* Pull back slightly on Z axis for parallax depth between img and text */
-  transform: translateZ(-20px) scale(1.05);
 }
 
 .img {
@@ -53,8 +64,8 @@
   transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.card:hover .img {
-  transform: scale(1.1); /* Image zooms while card tilts */
+.cardWrapper:hover .img {
+  transform: scale(1.05);
 }
 
 /* ─── Overlay & Text ────────────────────────────────────────────── */
@@ -63,32 +74,12 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(26, 18, 9, 0.8) 0%,
-    rgba(26, 18, 9, 0.1) 50%,
+    rgba(26, 18, 9, 0.9) 0%,
+    rgba(26, 18, 9, 0.1) 40%,
     transparent 100%
   );
+  pointer-events: none;
   transition: opacity 0.4s ease;
-}
-
-.countBadge {
-  position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  color: var(--white);
-  padding: 0.25rem 0.75rem;
-  font-size: var(--text-xs);
-  border-radius: var(--radius-full);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transform: translateZ(20px);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.card:hover .countBadge {
-  opacity: 1;
 }
 
 .cardLabel {
@@ -96,45 +87,67 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: var(--space-6);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--ivory);
-  transform: translateZ(30px); /* Push text forward in 3D space */
+  padding: var(--space-8);
+  pointer-events: none;
 }
 
 .cardName {
   font-family: var(--font-display);
-  font-size: var(--text-2xl);
+  font-size: var(--text-lg);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  color: var(--ivory);
 }
 
-.cardArrow {
-  font-size: var(--text-xl);
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* ─── Controls ─────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-12);
 }
 
-.card:hover .cardArrow {
-  opacity: 1;
-  transform: translateX(0);
+.arrowBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--parchment);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.arrowBtn:hover {
+  background-color: var(--cognac);
+  color: var(--ivory);
+  transform: scale(1.05);
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .small { grid-column: span 6; aspect-ratio: 4/3; }
+  .carouselInner {
+    max-width: 320px;
+  }
 }
 
-@media (max-width: 640px) {
-  .large, .medium, .small { 
-    grid-column: span 12; 
-    aspect-ratio: 4/3; 
+@media (max-width: 768px) {
+  .carouselInner {
+    max-width: 260px;
+    perspective: 800px;
   }
-  
-  /* Disable 3D tilt on mobile for performance/UX */
-  .cardWrapper { perspective: none; }
-  .card { transform: none !important; }
+  .cardName {
+    font-size: var(--text-base);
+  }
+}
+
+@media (max-width: 480px) {
+  .carouselInner {
+    max-width: 220px;
+  }
 }

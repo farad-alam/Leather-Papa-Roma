@@ -181,6 +181,15 @@ export default function SignatureCollection() {
   return (
     <section ref={containerRef} className={styles.wrapper} aria-label="Signature Collection">
 
+      {/* ── Top Header ── */}
+      <div className={styles.topHeader}>
+        <div className="container">
+          <span className="label-caps" style={{ display: "block", marginBottom: "0.5rem" }}>Exquisite Craftsmanship</span>
+          <h2 className={styles.topTitle}>The Signature Collection</h2>
+          <p className={styles.topDesc}>Our most premium pieces, crafted to perfection.</p>
+        </div>
+      </div>
+
       {/* ── Desktop: Sticky full-screen experience ── */}
       <div className={styles.sticky}>
 
