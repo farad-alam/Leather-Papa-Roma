@@ -1,8 +1,8 @@
 /* ─── Layout ─────────────────────────────────────────── */
 .heroWrapper {
   position: relative;
-  height: 300vh; /* Scroll container height */
-  background-color: var(--ink); /* Fallback background */
+  height: 300vh;
+  background-color: var(--ink);
 }
 
 .stickyContainer {
@@ -23,14 +23,12 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
   z-index: 0;
   will-change: contents;
 }
 
 .staticBg {
-  display: none; /* Hidden on desktop */
+  display: none;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -43,49 +41,98 @@
   object-position: center;
 }
 
+/* ─── Directional Overlay ────────────────────────────────── */
+/* Heavy dark on left (text side), fades to transparent on right (product side)
+   + bottom vignette to blend into the next section                            */
 .overlay {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  background: radial-gradient(
-    circle at center,
-    rgba(26, 18, 9, 0.45) 0%,
-    rgba(26, 18, 9, 0.75) 100%
-  );
+  z-index: 1;
+  background:
+    linear-gradient(to right, rgba(13, 9, 5, 0.94) 0%, rgba(13, 9, 5, 0.65) 45%, rgba(13, 9, 5, 0.08) 100%),
+    linear-gradient(to top, rgba(13, 9, 5, 0.75) 0%, transparent 28%);
 }
 
-/* ─── Loader ─────────────────────────────────────────────── */
-.loader {
+/* ─── Noise Texture ──────────────────────────────────────── */
+/* Pure CSS noise — tactile leather-like depth, zero performance cost */
+.noiseOverlay {
   position: absolute;
   inset: 0;
-  z-index: 10;
+  z-index: 2;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ─── Luxury Loader ──────────────────────────────────────── */
+.loader {
+  position: fixed; /* fixed so it covers Lenis-managed viewport */
+  inset: 0;
+  z-index: 100;
   background: var(--ink);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
+  gap: var(--space-3);
   color: var(--ivory);
-  transition: opacity 0.5s ease;
+  /* Slides up off-screen on completion instead of just fading */
+  transition: transform 0.85s cubic-bezier(0.76, 0, 0.24, 1);
 }
 
-.loaderSpinner {
-  width: 40px;
-  height: 40px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.loaderBrand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.loaderBrandMain {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--ivory);
+}
+
+.loaderBrandSub {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.loaderTagline {
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(250, 246, 240, 0.35);
+  margin-top: var(--space-6);
+}
+
+/* Full-width gold progress bar at the very bottom of the loader */
+.loaderBarWrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.loaderBar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, var(--cognac), var(--gold));
+  transition: width 0.25s ease;
 }
 
 /* ─── Content ────────────────────────────────────────────── */
 .content {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   width: 100%;
   padding-top: var(--navbar-height);
 }
@@ -94,41 +141,103 @@
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--container-padding);
-  max-width: 720px;
   padding-block: var(--space-16);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-16);
+  align-items: flex-end;
 }
 
-/* ─── Text ───────────────────────────────────────────────── */
-.kicker {
+/* ─── Left Column ────────────────────────────────────────── */
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* ─── Kicker Badge ───────────────────────────────────────── */
+.kickerWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(201, 169, 110, 0.35);
+  border-radius: var(--radius-full);
+  background: rgba(201, 169, 110, 0.07);
+  backdrop-filter: blur(8px);
+  width: fit-content;
+  margin-bottom: var(--space-2);
+}
+
+.kickerDot {
   display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;   transform: scale(1);   }
+  50%       { opacity: 0.3; transform: scale(0.65); }
+}
+
+.kicker {
   font-size: var(--text-xs);
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--gold-light);
+}
+
+/* ─── Gold Editorial Rule ────────────────────────────────── */
+.rule {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(to right, var(--gold), transparent);
   margin-bottom: var(--space-5);
 }
 
+/* ─── Headline with word-stagger reveal ─────────────────── */
 .headline {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-size: clamp(3.5rem, 8vw, 7rem);
   font-weight: 500;
-  line-height: 1.08;
+  line-height: 1.04;
   color: var(--ivory);
   margin-bottom: var(--space-6);
+  letter-spacing: -0.01em;
 }
 
-.headline em {
+.headlineLine {
+  display: block;
+}
+
+.headlineItalic {
+  display: block;
   font-style: italic;
   color: var(--gold-light);
 }
 
+/* Each word reveals from below with staggered delay (set inline) */
+.word {
+  display: inline-block;
+  animation: wordReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes wordReveal {
+  from { opacity: 0; transform: translateY(42px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ─── Subheading ─────────────────────────────────────────── */
 .sub {
   font-size: clamp(var(--text-base), 1.5vw, var(--text-lg));
-  color: rgba(250, 246, 240, 0.82);
+  color: rgba(250, 246, 240, 0.75);
   line-height: 1.7;
-  max-width: 52ch;
-  margin-bottom: var(--space-8);
+  max-width: 48ch;
 }
 
 /* ─── CTAs ───────────────────────────────────────────────── */
@@ -143,9 +252,8 @@
   display: flex;
   gap: var(--space-6);
   flex-wrap: wrap;
-  margin-top: var(--space-10);
-  padding-top: var(--space-8);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .trustItem {
@@ -153,64 +261,126 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-sm);
-  color: rgba(250, 246, 240, 0.75);
+  color: rgba(250, 246, 240, 0.6);
   font-weight: 400;
 }
 
-/* ─── Scroll Indicator ───────────────────────────────────── */
+/* ─── Right Column: Stats ────────────────────────────────── */
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+  padding-left: var(--space-12);
+  border-left: 1px solid rgba(250, 246, 240, 0.1);
+  padding-bottom: var(--space-2);
+  align-self: flex-end;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 500;
+  color: var(--gold-light);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statLabel {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(250, 246, 240, 0.4);
+}
+
+/* ─── Premium Scroll Indicator ───────────────────────────── */
+/* Circular ring + chevron, bottom-right for asymmetric elegance */
 .scrollIndicator {
   position: absolute;
   bottom: var(--space-8);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
+  right: var(--space-10);
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
 }
 
-.scrollLine {
-  width: 1px;
-  height: 48px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
-  animation: scrollPulse 2s ease-in-out infinite;
+.scrollRing {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.55);
+  animation: scrollBounce 1.8s ease-in-out infinite;
 }
 
-@keyframes scrollPulse {
-  0%, 100% { opacity: 0.5; transform: scaleY(1); transform-origin: top; }
-  50%       { opacity: 1;   transform: scaleY(0.5); transform-origin: top; }
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0);  }
+  50%       { transform: translateY(6px); }
 }
 
 .scrollLabel {
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  font-size: 9px;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .rightCol {
+    display: none; /* Stats column only on wide screens */
+  }
+  .inner {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  /* On mobile, disable the 300vh scroll and use static fallback */
   .heroWrapper {
     height: auto;
   }
-  
+
   .stickyContainer {
     position: relative;
     height: 100dvh;
   }
-  
+
   .canvas {
     display: none;
   }
-  
+
   .staticBg {
     display: block;
   }
-  
-  .inner { padding-block: var(--space-12); }
-  .ctas  { flex-direction: column; }
-  .trust { gap: var(--space-4); }
+
+  /* Mobile overlay — more centered radial, less directional */
+  .overlay {
+    background:
+      radial-gradient(circle at 40% 50%, rgba(13, 9, 5, 0.45) 0%, rgba(13, 9, 5, 0.88) 100%),
+      linear-gradient(to top, rgba(13, 9, 5, 0.8) 0%, transparent 30%);
+  }
+
+  .inner {
+    padding-block: var(--space-12);
+    grid-template-columns: 1fr;
+  }
+
+  .headline {
+    font-size: clamp(2.5rem, 10vw, 3.5rem);
+  }
+
+  .ctas    { flex-direction: column; }
+  .trust   { gap: var(--space-4); }
   .scrollIndicator { display: none; }
 }

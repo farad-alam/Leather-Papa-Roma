@@ -10,22 +10,29 @@ const FRAME_COUNT = 285;
 const FRAME_URL = (index: number) =>
   `/Hero%20Scroll%20animation%20images/ezgif-frame-${index.toString().padStart(3, "0")}.jpg`;
 
+const STATS = [
+  { value: "500+", label: "Happy Customers" },
+  { value: "100%", label: "Full-Grain Leather" },
+  { value: "3yr+", label: "Product Lifespan" },
+];
+
 export default function HeroSection() {
   const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to order a leather product.")}`;
 
-  const containerRef    = useRef<HTMLDivElement>(null);
-  const canvasRef       = useRef<HTMLCanvasElement>(null);
-  const loaderRef       = useRef<HTMLDivElement>(null);
-  const loaderTextRef   = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const loaderRef    = useRef<HTMLDivElement>(null);
+  const loaderBarRef = useRef<HTMLDivElement>(null);
 
   // Text element refs — driven via DOM, never React state
-  const headerRef       = useRef<HTMLDivElement>(null);
-  const ctaRef          = useRef<HTMLDivElement>(null);
-  const trustRef        = useRef<HTMLDivElement>(null);
-  const indicatorRef    = useRef<HTMLDivElement>(null);
+  const headerRef    = useRef<HTMLDivElement>(null);
+  const ctaRef       = useRef<HTMLDivElement>(null);
+  const trustRef     = useRef<HTMLDivElement>(null);
+  const statsRef     = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLDivElement>(null);
 
-  const imagesRef       = useRef<HTMLImageElement[]>([]);
-  const isMobileRef     = useRef(false);
+  const imagesRef    = useRef<HTMLImageElement[]>([]);
+  const isMobileRef  = useRef(false);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -48,9 +55,10 @@ export default function HeroSection() {
       ctx.scale(dpr, dpr);
     }
 
+    // Use cover ratio so image fills the whole canvas
     const hRatio = rect.width / img.width;
     const vRatio = rect.height / img.height;
-    const ratio  = Math.min(hRatio, vRatio);
+    const ratio  = Math.max(hRatio, vRatio);
     const sx = (rect.width  - img.width  * ratio) / 2;
     const sy = (rect.height - img.height * ratio) / 2;
 
@@ -69,19 +77,19 @@ export default function HeroSection() {
     // 2. Header: visible at 0, fades out between 0% → 15%. Fades in between 70% → 85%
     let headerOp = 0;
     let headerTY = 0;
-    
+
     if (progress <= 0.15) {
       headerOp = 1 - progress / 0.15;
-      headerTY = -(progress / 0.15) * 30; // moves up and fades out
+      headerTY = -(progress / 0.15) * 30;
     } else if (progress >= 0.70) {
       headerOp = Math.max(0, Math.min(1, (progress - 0.7) / 0.15));
-      headerTY = (1 - headerOp) * 30; // moves up from 30px to 0px
+      headerTY = (1 - headerOp) * 30;
     }
 
     if (headerRef.current) {
-      headerRef.current.style.opacity        = String(Math.min(1, headerOp));
-      headerRef.current.style.transform      = `translateY(${headerTY}px)`;
-      headerRef.current.style.pointerEvents  = headerOp < 0.05 ? "none" : "auto";
+      headerRef.current.style.opacity       = String(Math.min(1, headerOp));
+      headerRef.current.style.transform     = `translateY(${headerTY}px)`;
+      headerRef.current.style.pointerEvents = headerOp < 0.05 ? "none" : "auto";
     }
 
     // 3. Scroll indicator: fades out between 0% → 10%
@@ -90,7 +98,7 @@ export default function HeroSection() {
       indicatorRef.current.style.opacity = String(indicatorOp);
     }
 
-    // 4. CTAs + trust strip: fade in between 70% → 85%
+    // 4. CTAs + trust: fade in between 70% → 85%
     const ctaOp = Math.max(0, Math.min(1, (progress - 0.7) / 0.15));
     const ctaTY = (1 - ctaOp) * 30;
     if (ctaRef.current) {
@@ -103,6 +111,14 @@ export default function HeroSection() {
       trustRef.current.style.transform     = `translateY(${ctaTY}px)`;
       trustRef.current.style.pointerEvents = ctaOp < 0.05 ? "none" : "auto";
     }
+
+    // 5. Stats column: slides in from right, also at 70% → 85%
+    const statsTX = (1 - ctaOp) * 24;
+    if (statsRef.current) {
+      statsRef.current.style.opacity       = String(ctaOp);
+      statsRef.current.style.transform     = `translateX(${statsTX}px)`;
+      statsRef.current.style.pointerEvents = ctaOp < 0.05 ? "none" : "auto";
+    }
   });
 
   // ── Image preload — no setState, only DOM refs ───────────────────────────
@@ -110,21 +126,25 @@ export default function HeroSection() {
     isMobileRef.current = window.innerWidth <= 768;
 
     if (!isMobileRef.current) {
-      // Set initial DOM state for desktop text elements
       if (headerRef.current) {
-        headerRef.current.style.opacity = "1";
-        headerRef.current.style.transform = "translateY(0px)";
+        headerRef.current.style.opacity       = "1";
+        headerRef.current.style.transform     = "translateY(0px)";
         headerRef.current.style.pointerEvents = "auto";
       }
       if (ctaRef.current) {
-        ctaRef.current.style.opacity = "0";
-        ctaRef.current.style.transform = "translateY(30px)";
+        ctaRef.current.style.opacity       = "0";
+        ctaRef.current.style.transform     = "translateY(30px)";
         ctaRef.current.style.pointerEvents = "none";
       }
       if (trustRef.current) {
-        trustRef.current.style.opacity = "0";
-        trustRef.current.style.transform = "translateY(30px)";
+        trustRef.current.style.opacity       = "0";
+        trustRef.current.style.transform     = "translateY(30px)";
         trustRef.current.style.pointerEvents = "none";
+      }
+      if (statsRef.current) {
+        statsRef.current.style.opacity       = "0";
+        statsRef.current.style.transform     = "translateX(24px)";
+        statsRef.current.style.pointerEvents = "none";
       }
     }
 
@@ -138,14 +158,23 @@ export default function HeroSection() {
       img.src = FRAME_URL(i);
       img.onload = () => {
         loaded++;
-        if (loaderTextRef.current) {
-          loaderTextRef.current.textContent =
-            `Loading experience... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
+        const pct = Math.round((loaded / FRAME_COUNT) * 100);
+
+        // Drive progress bar via DOM ref
+        if (loaderBarRef.current) {
+          loaderBarRef.current.style.width = `${pct}%`;
         }
+
         if (loaded === 10) renderFrame(0);
+
         if (loaded >= FRAME_COUNT && loaderRef.current) {
-          loaderRef.current.style.opacity = "0";
-          loaderRef.current.style.pointerEvents = "none";
+          // Short pause at 100% then slide loader up off screen
+          setTimeout(() => {
+            if (loaderRef.current) {
+              loaderRef.current.style.transform     = "translateY(-100%)";
+              loaderRef.current.style.pointerEvents = "none";
+            }
+          }, 350);
         }
       };
       images.push(img);
@@ -172,81 +201,142 @@ export default function HeroSection() {
           />
         </div>
 
+        {/* Directional gradient overlay */}
         <div className={styles.overlay} />
 
-        {/* Loader */}
+        {/* Subtle noise texture for tactile depth */}
+        <div className={styles.noiseOverlay} aria-hidden="true" />
+
+        {/* ── Luxury Loader ── */}
         <div ref={loaderRef} className={styles.loader}>
-          <div className={styles.loaderSpinner} />
-          <span ref={loaderTextRef}>Loading experience... 0%</span>
+          <div className={styles.loaderBrand}>
+            <span className={styles.loaderBrandMain}>PAPA ROMA</span>
+            <span className={styles.loaderBrandSub}>LEATHER</span>
+          </div>
+          <p className={styles.loaderTagline}>Loading your experience</p>
+          <div className={styles.loaderBarWrap}>
+            <div ref={loaderBarRef} className={styles.loaderBar} />
+          </div>
         </div>
 
-        {/* Content */}
+        {/* ── Content ── */}
         <div className={styles.content}>
           <div className={styles.inner}>
 
-            {/* Header text — opacity + transform driven via DOM ref */}
-            <div
-              ref={headerRef}
-              style={{ transition: "opacity 0.3s ease, transform 0.3s ease" }}
-            >
-              <span className={styles.kicker}>
-                Full-Grain Leather · Handcrafted in Bangladesh
-              </span>
-              <h1 className={styles.headline}>
-                <span style={{ display: "block" }}>Crafted to Last.</span>
-                <em style={{ display: "block" }}>Signed by You.</em>
-              </h1>
-              <p className={styles.sub}>
-                Premium leather wallets, cardholders, belts &amp; diary covers —
-                with optional custom embossing for a personal touch.
-              </p>
-            </div>
+            {/* Left column */}
+            <div className={styles.leftCol}>
 
-            {/* CTAs — fade in at end of scroll */}
-            <div
-              ref={ctaRef}
-              className={styles.ctas}
-              style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
-            >
-              <Link href="/shop" className="btn btn-primary btn-lg">
-                Shop Collection
-              </Link>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-ghost btn-lg"
+              {/* Header — opacity + transform driven via DOM ref */}
+              <div
+                ref={headerRef}
+                style={{ transition: "opacity 0.3s ease, transform 0.3s ease" }}
               >
-                <WhatsAppIcon /> Order via WhatsApp
-              </a>
+                {/* Premium kicker badge */}
+                <div className={styles.kickerWrap}>
+                  <span className={styles.kickerDot} aria-hidden="true" />
+                  <span className={styles.kicker}>
+                    Full-Grain Leather · Handcrafted in Bangladesh
+                  </span>
+                </div>
+
+                {/* Gold editorial separator rule */}
+                <div className={styles.rule} aria-hidden="true" />
+
+                {/* Word-staggered headline */}
+                <h1 className={styles.headline}>
+                  <span className={styles.headlineLine}>
+                    {"Crafted to Last.".split(" ").map((word, i) => (
+                      <span
+                        key={i}
+                        className={styles.word}
+                        style={{ animationDelay: `${i * 0.1 + 0.1}s` }}
+                      >
+                        {word}{" "}
+                      </span>
+                    ))}
+                  </span>
+                  <em className={styles.headlineItalic}>
+                    {"Signed by You.".split(" ").map((word, i) => (
+                      <span
+                        key={i}
+                        className={styles.word}
+                        style={{ animationDelay: `${i * 0.1 + 0.45}s` }}
+                      >
+                        {word}{" "}
+                      </span>
+                    ))}
+                  </em>
+                </h1>
+
+                <p className={styles.sub}>
+                  Premium leather wallets, cardholders, belts &amp; diary covers —
+                  with optional custom embossing for a personal touch.
+                </p>
+              </div>
+
+              {/* CTAs — fade in at end of scroll */}
+              <div
+                ref={ctaRef}
+                className={styles.ctas}
+                style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
+              >
+                <Link href="/shop" className="btn btn-primary btn-lg">
+                  Shop Collection
+                </Link>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-ghost btn-lg"
+                >
+                  <WhatsAppIcon /> Order via WhatsApp
+                </a>
+              </div>
+
+              {/* Trust strip — fades in with CTAs */}
+              <div
+                ref={trustRef}
+                className={styles.trust}
+                style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
+              >
+                {["100% Full-Grain Leather", "Custom Embossing Available", "Ships Across Bangladesh"].map(
+                  (item) => (
+                    <span key={item} className={styles.trustItem}>
+                      <CheckIcon /> {item}
+                    </span>
+                  )
+                )}
+              </div>
+
             </div>
 
-            {/* Trust strip — fades in with CTAs */}
+            {/* Right column: stats — slides in from right with CTAs */}
             <div
-              ref={trustRef}
-              className={styles.trust}
-              style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
+              ref={statsRef}
+              className={styles.rightCol}
+              style={{ transition: "opacity 0.5s ease, transform 0.5s ease" }}
             >
-              {["100% Full-Grain Leather", "Custom Embossing Available", "Ships Across Bangladesh"].map(
-                (item) => (
-                  <span key={item} className={styles.trustItem}>
-                    <CheckIcon /> {item}
-                  </span>
-                )
-              )}
+              {STATS.map((stat) => (
+                <div key={stat.value} className={styles.stat}>
+                  <span className={styles.statValue}>{stat.value}</span>
+                  <span className={styles.statLabel}>{stat.label}</span>
+                </div>
+              ))}
             </div>
 
           </div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* ── Premium Scroll Indicator — bottom-right ── */}
         <div
           ref={indicatorRef}
           className={styles.scrollIndicator}
           aria-hidden="true"
           style={{ transition: "opacity 0.3s ease" }}
         >
-          <div className={styles.scrollLine} />
+          <div className={styles.scrollRing}>
+            <ChevronDownIcon />
+          </div>
           <span className={styles.scrollLabel}>Scroll</span>
         </div>
 
@@ -267,6 +357,14 @@ function CheckIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9" />
     </svg>
   );
 }
