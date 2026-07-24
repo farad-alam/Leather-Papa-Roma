@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useMotionValueEvent, MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import styles from "./SignatureCollection.module.css";
 
 const FRAME_COUNT = 240;
@@ -45,7 +45,7 @@ const PRODUCTS = [
     tagline: "Even the small things deserve craft.",
     desc: "Keep your keys organized and silent. A touch of luxury you carry with you every single day.",
     link: "/shop",
-    image: "/Leather Product -frames/frame-0240.jpg",
+    image: "/Leather Product -frames/frame-0200.jpg",
   },
 ];
 
@@ -54,7 +54,6 @@ export default function SignatureCollection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
   const loaderTextRef = useRef<HTMLSpanElement>(null);
-
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const isMobileRef = useRef(false);
 
@@ -63,7 +62,36 @@ export default function SignatureCollection() {
     offset: ["start start", "end end"],
   });
 
-  // Render frame to canvas (Desktop only)
+  // ─── ALL useTransform calls at top level — never inside loops ───────────
+  // Product 1: Wallet — visible 0%→22%, fades out 22%→25%
+  const op0 = useTransform(scrollYProgress, [0, 0.22, 0.25], [1, 1, 0], { clamp: true });
+  const y0  = useTransform(scrollYProgress, [0, 0.22, 0.25], [0, 0, -24], { clamp: true });
+  const pe0 = useTransform(op0, (v) => (v < 0.02 ? "none" : "auto"));
+
+  // Product 2: Diary — fades in 23%→27%, visible 27%→47%, fades out 47%→50%
+  const op1 = useTransform(scrollYProgress, [0.23, 0.27, 0.47, 0.50], [0, 1, 1, 0], { clamp: true });
+  const y1  = useTransform(scrollYProgress, [0.23, 0.27, 0.47, 0.50], [24, 0, 0, -24], { clamp: true });
+  const pe1 = useTransform(op1, (v) => (v < 0.02 ? "none" : "auto"));
+
+  // Product 3: Belt — fades in 48%→52%, visible 52%→72%, fades out 72%→75%
+  const op2 = useTransform(scrollYProgress, [0.48, 0.52, 0.72, 0.75], [0, 1, 1, 0], { clamp: true });
+  const y2  = useTransform(scrollYProgress, [0.48, 0.52, 0.72, 0.75], [24, 0, 0, -24], { clamp: true });
+  const pe2 = useTransform(op2, (v) => (v < 0.02 ? "none" : "auto"));
+
+  // Product 4: Key Fob — fades in 73%→77%, stays visible to 100%
+  const op3 = useTransform(scrollYProgress, [0.73, 0.77, 1.0], [0, 1, 1], { clamp: true });
+  const y3  = useTransform(scrollYProgress, [0.73, 0.77, 1.0], [24, 0, 0], { clamp: true });
+  const pe3 = useTransform(op3, (v) => (v < 0.02 ? "none" : "auto"));
+
+  const cardAnimations = [
+    { opacity: op0, y: y0, pointerEvents: pe0 },
+    { opacity: op1, y: y1, pointerEvents: pe1 },
+    { opacity: op2, y: y2, pointerEvents: pe2 },
+    { opacity: op3, y: y3, pointerEvents: pe3 },
+  ];
+  // ────────────────────────────────────────────────────────────────────────
+
+  // Canvas draw
   const renderFrame = (index: number) => {
     const canvas = canvasRef.current;
     const img = imagesRef.current[index];
@@ -79,9 +107,10 @@ export default function SignatureCollection() {
       ctx.scale(dpr, dpr);
     }
 
+    // Cover — fills full screen, crops edges if needed
     const hRatio = rect.width / img.width;
     const vRatio = rect.height / img.height;
-    const ratio = Math.max(hRatio, vRatio); // Use max to 'cover' since it's a backdrop
+    const ratio = Math.max(hRatio, vRatio);
     const sx = (rect.width - img.width * ratio) / 2;
     const sy = (rect.height - img.height * ratio) / 2;
 
@@ -95,7 +124,6 @@ export default function SignatureCollection() {
     requestAnimationFrame(() => renderFrame(frameIndex));
   });
 
-  // Preload images
   useEffect(() => {
     isMobileRef.current = window.innerWidth <= 768;
     if (isMobileRef.current) return;
@@ -103,7 +131,6 @@ export default function SignatureCollection() {
     let loaded = 0;
     const images: HTMLImageElement[] = [];
 
-    // The frames are 1-indexed up to 240
     for (let i = 1; i <= FRAME_COUNT; i++) {
       const img = new window.Image();
       img.src = FRAME_URL(i);
@@ -112,14 +139,10 @@ export default function SignatureCollection() {
         if (loaderTextRef.current) {
           loaderTextRef.current.textContent = `Loading collection... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
         }
-        if (loaded === 10) {
-          renderFrame(0);
-        }
-        if (loaded >= FRAME_COUNT) {
-          if (loaderRef.current) {
-            loaderRef.current.style.opacity = "0";
-            loaderRef.current.style.pointerEvents = "none";
-          }
+        if (loaded === 10) renderFrame(0);
+        if (loaded >= FRAME_COUNT && loaderRef.current) {
+          loaderRef.current.style.opacity = "0";
+          loaderRef.current.style.pointerEvents = "none";
         }
       };
       images.push(img);
@@ -127,63 +150,45 @@ export default function SignatureCollection() {
     imagesRef.current = images;
   }, []);
 
-  // Opacity & Y transforms for the 4 products
-  const opacities = [
-    useTransform(scrollYProgress, [0, 0.2, 0.25], [1, 1, 0], { clamp: true }),
-    useTransform(scrollYProgress, [0.22, 0.27, 0.45, 0.5], [0, 1, 1, 0], { clamp: true }),
-    useTransform(scrollYProgress, [0.47, 0.52, 0.7, 0.75], [0, 1, 1, 0], { clamp: true }),
-    useTransform(scrollYProgress, [0.72, 0.77, 1], [0, 1, 1], { clamp: true }),
-  ];
-
-  const ys = [
-    useTransform(scrollYProgress, [0, 0.2, 0.25], [0, 0, -20], { clamp: true }),
-    useTransform(scrollYProgress, [0.22, 0.27, 0.45, 0.5], [20, 0, 0, -20], { clamp: true }),
-    useTransform(scrollYProgress, [0.47, 0.52, 0.7, 0.75], [20, 0, 0, -20], { clamp: true }),
-    useTransform(scrollYProgress, [0.72, 0.77, 1], [20, 0, 0], { clamp: true }),
-  ];
-
   return (
     <section ref={containerRef} className={styles.wrapper} aria-label="Signature Collection">
-      
-      {/* Desktop Sticky Scroll Experience */}
+
+      {/* ── Desktop: Sticky full-screen canvas + overlay text ── */}
       <div className={styles.sticky}>
-        
-        {/* Left 60%: Canvas */}
-        <div className={styles.canvasWrapper}>
-          <canvas ref={canvasRef} className={styles.canvas} />
-          <div ref={loaderRef} className={styles.loader}>
-            <div className={styles.loaderSpinner} />
-            <span ref={loaderTextRef}>Loading collection... 0%</span>
-          </div>
+
+        {/* Full-width canvas */}
+        <canvas ref={canvasRef} className={styles.canvas} />
+
+        {/* Loader */}
+        <div ref={loaderRef} className={styles.loader}>
+          <div className={styles.loaderSpinner} />
+          <span ref={loaderTextRef}>Loading collection... 0%</span>
         </div>
 
-        {/* Right 40%: Text Panel */}
-        <div className={styles.textPanel}>
-          {PRODUCTS.map((product, i) => {
-            const opacity = opacities[i];
-            const y = ys[i];
-            const pointerEvents = useTransform(opacity, (v) => (v === 0 ? "none" : "auto"));
+        {/* Gradient behind text — transparent on left, dark on right */}
+        <div className={styles.textGradient} aria-hidden="true" />
 
-            return (
-              <motion.div
-                key={product.id}
-                className={styles.productCard}
-                style={{ opacity, y, pointerEvents }}
-              >
-                <span className={styles.kicker}>{product.kicker}</span>
-                <h2 className={styles.title}>{product.title}</h2>
-                <p className={styles.tagline}>"{product.tagline}"</p>
-                <p className={styles.desc}>{product.desc}</p>
-                <Link href={product.link} className={`btn btn-primary ${styles.cta}`}>
-                  Shop Collection
-                </Link>
-              </motion.div>
-            );
-          })}
+        {/* Text panel — overlaid on top of canvas */}
+        <div className={styles.textPanel}>
+          {PRODUCTS.map((product, i) => (
+            <motion.div
+              key={product.id}
+              className={styles.productCard}
+              style={cardAnimations[i]}
+            >
+              <span className={styles.kicker}>{product.kicker}</span>
+              <h2 className={styles.title}>{product.title}</h2>
+              <p className={styles.tagline}>&ldquo;{product.tagline}&rdquo;</p>
+              <p className={styles.desc}>{product.desc}</p>
+              <Link href={product.link} className={`btn btn-primary ${styles.cta}`}>
+                Shop Collection
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
 
-      {/* Mobile Fallback: Vertical Stack */}
+      {/* ── Mobile: Static vertical stack ── */}
       <div className={styles.mobileFallback}>
         <div className={styles.mobileInner}>
           <h2 className={styles.mobileSectionTitle}>The Signature Collection</h2>
@@ -202,9 +207,7 @@ export default function SignatureCollection() {
               <h3 className={styles.title} style={{ fontSize: "2rem" }}>
                 {product.title}
               </h3>
-              <p className={styles.tagline} style={{ fontSize: "1.2rem" }}>
-                "{product.tagline}"
-              </p>
+              <p className={styles.tagline}>&ldquo;{product.tagline}&rdquo;</p>
               <p className={styles.desc}>{product.desc}</p>
               <Link href={product.link} className="btn btn-outline">
                 Shop Now
@@ -213,6 +216,7 @@ export default function SignatureCollection() {
           ))}
         </div>
       </div>
+
     </section>
   );
 }

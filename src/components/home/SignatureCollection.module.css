@@ -1,9 +1,7 @@
 /* ─── Layout ─────────────────────────────────────────── */
 .wrapper {
   position: relative;
-  height: 500vh; /* 4 products = 400vh + 100vh buffer */
-  background-color: var(--ink);
-  color: var(--ivory);
+  height: 500vh;
 }
 
 .sticky {
@@ -13,26 +11,33 @@
   min-height: 600px;
   width: 100%;
   overflow: hidden;
-  display: flex;
-  align-items: center;
 }
 
-/* ─── Canvas (Left 60%) ──────────────────────────────── */
-.canvasWrapper {
-  position: relative;
-  width: 60%;
-  height: 100%;
-}
-
+/* ─── Canvas — full-screen background ──────────────────── */
 .canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center;
-  z-index: 0;
+  display: block;
   will-change: contents;
+}
+
+/* ─── Gradient overlay behind text ──────────────────────── */
+.textGradient {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 48%;
+  height: 100%;
+  /* Transparent on the left edge, dark on the right — text sits on dark */
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(16, 9, 4, 0.72) 28%,
+    rgba(16, 9, 4, 0.88) 100%
+  );
+  pointer-events: none;
 }
 
 /* ─── Loader ─────────────────────────────────────────── */
@@ -40,13 +45,14 @@
   position: absolute;
   inset: 0;
   z-index: 10;
-  background: var(--ink);
+  background: #1a0f08;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  transition: opacity 0.5s ease;
+  transition: opacity 0.6s ease;
+  color: var(--ivory);
 }
 
 .loaderSpinner {
@@ -62,25 +68,27 @@
   to { transform: rotate(360deg); }
 }
 
-/* ─── Text Panel (Right 40%) ─────────────────────────── */
+/* ─── Text Panel — absolute overlay on right ─────────── */
 .textPanel {
-  position: relative;
-  width: 40%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44%;
   height: 100%;
   display: flex;
   align-items: center;
-  padding: var(--space-8) var(--space-12) var(--space-8) 0;
-  z-index: 1;
+  padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8);
+  z-index: 2;
 }
 
 .productCard {
   position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: var(--space-4);
-  max-width: 480px;
-  width: 100%;
-  padding-right: var(--space-8);
+  padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8);
 }
 
 .kicker {
@@ -93,7 +101,7 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-size: clamp(2.2rem, 3.5vw, 3.2rem);
   font-weight: 500;
   line-height: 1.1;
   color: var(--ivory);
@@ -101,16 +109,17 @@
 
 .tagline {
   font-family: var(--font-display);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-style: italic;
-  color: var(--gold-light);
+  color: var(--gold-light, #d4a96a);
   margin-top: calc(var(--space-2) * -1);
 }
 
 .desc {
-  font-size: var(--text-base);
-  color: rgba(250, 246, 240, 0.82);
+  font-size: var(--text-sm);
+  color: rgba(250, 246, 240, 0.80);
   line-height: 1.7;
+  max-width: 360px;
 }
 
 .cta {
@@ -121,7 +130,7 @@
 /* ─── Mobile Fallback ────────────────────────────────── */
 .mobileFallback {
   display: none;
-  background-color: var(--ink);
+  background-color: #1a0f08;
   color: var(--ivory);
 }
 
@@ -151,7 +160,7 @@
 .mobileImgWrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 16/9;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: rgba(255,255,255,0.05);
@@ -163,19 +172,13 @@
 
 /* ─── Responsive ─────────────────────────────────────── */
 @media (max-width: 992px) {
-  .canvasWrapper { width: 50%; }
-  .textPanel { width: 50%; padding-right: var(--space-6); }
-  .title { font-size: clamp(2rem, 4vw, 2.5rem); }
+  .textPanel { width: 52%; padding-right: var(--space-6); }
+  .textGradient { width: 56%; }
+  .title { font-size: clamp(1.8rem, 3.5vw, 2.4rem); }
 }
 
 @media (max-width: 768px) {
-  .wrapper {
-    height: auto;
-  }
-  .sticky {
-    display: none;
-  }
-  .mobileFallback {
-    display: block;
-  }
+  .wrapper { height: auto; }
+  .sticky { display: none; }
+  .mobileFallback { display: block; }
 }
