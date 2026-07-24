@@ -7,6 +7,7 @@ import EmbossingBanner from "@/components/home/EmbossingBanner";
 import GiftGuideTeaser from "@/components/home/GiftGuideTeaser";
 import Testimonials from "@/components/home/Testimonials";
 import MarqueeTicker from "@/components/home/MarqueeTicker";
+import SignatureCollection from "@/components/home/SignatureCollection";
 
 export const metadata: Metadata = {
   title: "Papa Roma Leather — Premium Full-Grain Leather Goods Bangladesh",
@@ -64,6 +65,7 @@ export default function HomePage() {
       <HeroSection />
       <CategoryGrid />
       <MarqueeTicker />
+      <SignatureCollection />
       <FeaturedProducts products={FEATURED_PRODUCTS} />
       <CraftStory />
       <EmbossingBanner />
