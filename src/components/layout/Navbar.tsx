@@ -45,7 +45,7 @@ export default function Navbar() {
 
   const navClass = [
     styles.navbar,
-    scrolled || !isHeroPage ? styles.solid : styles.transparent,
+    !isHeroPage ? styles.solid : (scrolled ? styles.hidden : styles.transparent),
   ].join(" ");
 
   return (

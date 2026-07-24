@@ -89,6 +89,8 @@
   justify-content: center;
   gap: var(--space-4);
   padding: var(--space-8) var(--space-12) var(--space-8) var(--space-8);
+  /* Smooth fade + slide — driven by DOM ref, not Framer Motion */
+  transition: opacity 0.55s ease, transform 0.55s ease;
 }
 
 .kicker {

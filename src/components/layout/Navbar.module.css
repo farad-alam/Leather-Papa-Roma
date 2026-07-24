@@ -9,6 +9,10 @@
   border-bottom: 1px solid transparent;
 }
 
+.hidden {
+  transform: translateY(-100%);
+}
+
 .transparent {
   background: transparent;
   color: var(--ivory);

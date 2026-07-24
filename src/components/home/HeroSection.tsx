@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useScroll, useMotionValueEvent } from "framer-motion";
 import styles from "./HeroSection.module.css";
 
 const FRAME_COUNT = 285;
@@ -13,33 +13,26 @@ const FRAME_URL = (index: number) =>
 export default function HeroSection() {
   const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to order a leather product.")}`;
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const loaderRef = useRef<HTMLDivElement>(null);
-  const loaderTextRef = useRef<HTMLSpanElement>(null);
+  const containerRef    = useRef<HTMLDivElement>(null);
+  const canvasRef       = useRef<HTMLCanvasElement>(null);
+  const loaderRef       = useRef<HTMLDivElement>(null);
+  const loaderTextRef   = useRef<HTMLSpanElement>(null);
 
-  // Store images and mobile flag in refs — NEVER in state — to avoid re-renders
-  const imagesRef = useRef<HTMLImageElement[]>([]);
-  const isMobileRef = useRef(false);
+  // Text element refs — driven via DOM, never React state
+  const headerRef       = useRef<HTMLDivElement>(null);
+  const ctaRef          = useRef<HTMLDivElement>(null);
+  const trustRef        = useRef<HTMLDivElement>(null);
+  const indicatorRef    = useRef<HTMLDivElement>(null);
 
-  // Scroll tracking
+  const imagesRef       = useRef<HTMLImageElement[]>([]);
+  const isMobileRef     = useRef(false);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Text fades out as scroll begins (0 → 15%)
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0], { clamp: true });
-  const headerY      = useTransform(scrollYProgress, [0, 0.15], [0, -30], { clamp: true });
-
-  // CTAs fade in near the end (70% → 85%)
-  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.85], [0, 1], { clamp: true });
-  const ctaY       = useTransform(scrollYProgress, [0.7, 0.85], [30, 0], { clamp: true });
-
-  // Scroll indicator fades out immediately
-  const indicatorOpacity = useTransform(scrollYProgress, [0, 0.1], [1, 0], { clamp: true });
-
-  // Canvas draw — completely outside React render cycle
+  // ── Canvas draw ──────────────────────────────────────────────────────────
   const renderFrame = (index: number) => {
     const canvas = canvasRef.current;
     const img = imagesRef.current[index];
@@ -57,23 +50,84 @@ export default function HeroSection() {
 
     const hRatio = rect.width / img.width;
     const vRatio = rect.height / img.height;
-    const ratio = Math.min(hRatio, vRatio);
-    const sx = (rect.width - img.width * ratio) / 2;
+    const ratio  = Math.min(hRatio, vRatio);
+    const sx = (rect.width  - img.width  * ratio) / 2;
     const sy = (rect.height - img.height * ratio) / 2;
 
     ctx.clearRect(0, 0, rect.width, rect.height);
     ctx.drawImage(img, 0, 0, img.width, img.height, sx, sy, img.width * ratio, img.height * ratio);
   };
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+  // ── Single scroll listener — drives canvas + all text animations via DOM ─
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
     if (isMobileRef.current) return;
-    const frameIndex = Math.min(FRAME_COUNT - 1, Math.max(0, Math.floor(latest * FRAME_COUNT)));
+
+    // 1. Canvas frame
+    const frameIndex = Math.min(FRAME_COUNT - 1, Math.max(0, Math.floor(progress * FRAME_COUNT)));
     requestAnimationFrame(() => renderFrame(frameIndex));
+
+    // 2. Header: visible at 0, fades out between 0% → 15%. Fades in between 70% → 85%
+    let headerOp = 0;
+    let headerTY = 0;
+    
+    if (progress <= 0.15) {
+      headerOp = 1 - progress / 0.15;
+      headerTY = -(progress / 0.15) * 30; // moves up and fades out
+    } else if (progress >= 0.70) {
+      headerOp = Math.max(0, Math.min(1, (progress - 0.7) / 0.15));
+      headerTY = (1 - headerOp) * 30; // moves up from 30px to 0px
+    }
+
+    if (headerRef.current) {
+      headerRef.current.style.opacity        = String(Math.min(1, headerOp));
+      headerRef.current.style.transform      = `translateY(${headerTY}px)`;
+      headerRef.current.style.pointerEvents  = headerOp < 0.05 ? "none" : "auto";
+    }
+
+    // 3. Scroll indicator: fades out between 0% → 10%
+    const indicatorOp = Math.max(0, 1 - progress / 0.1);
+    if (indicatorRef.current) {
+      indicatorRef.current.style.opacity = String(indicatorOp);
+    }
+
+    // 4. CTAs + trust strip: fade in between 70% → 85%
+    const ctaOp = Math.max(0, Math.min(1, (progress - 0.7) / 0.15));
+    const ctaTY = (1 - ctaOp) * 30;
+    if (ctaRef.current) {
+      ctaRef.current.style.opacity       = String(ctaOp);
+      ctaRef.current.style.transform     = `translateY(${ctaTY}px)`;
+      ctaRef.current.style.pointerEvents = ctaOp < 0.05 ? "none" : "auto";
+    }
+    if (trustRef.current) {
+      trustRef.current.style.opacity       = String(ctaOp);
+      trustRef.current.style.transform     = `translateY(${ctaTY}px)`;
+      trustRef.current.style.pointerEvents = ctaOp < 0.05 ? "none" : "auto";
+    }
   });
 
-  // Preload images — use refs for loader text, never setState
+  // ── Image preload — no setState, only DOM refs ───────────────────────────
   useEffect(() => {
     isMobileRef.current = window.innerWidth <= 768;
+
+    if (!isMobileRef.current) {
+      // Set initial DOM state for desktop text elements
+      if (headerRef.current) {
+        headerRef.current.style.opacity = "1";
+        headerRef.current.style.transform = "translateY(0px)";
+        headerRef.current.style.pointerEvents = "auto";
+      }
+      if (ctaRef.current) {
+        ctaRef.current.style.opacity = "0";
+        ctaRef.current.style.transform = "translateY(30px)";
+        ctaRef.current.style.pointerEvents = "none";
+      }
+      if (trustRef.current) {
+        trustRef.current.style.opacity = "0";
+        trustRef.current.style.transform = "translateY(30px)";
+        trustRef.current.style.pointerEvents = "none";
+      }
+    }
+
     if (isMobileRef.current) return;
 
     let loaded = 0;
@@ -84,19 +138,14 @@ export default function HeroSection() {
       img.src = FRAME_URL(i);
       img.onload = () => {
         loaded++;
-        // Update loader text via DOM ref — no re-render triggered
         if (loaderTextRef.current) {
-          loaderTextRef.current.textContent = `Loading experience... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
+          loaderTextRef.current.textContent =
+            `Loading experience... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
         }
-        if (loaded === 10) {
-          renderFrame(0);
-        }
-        if (loaded >= FRAME_COUNT) {
-          // Hide loader via DOM ref — no re-render triggered
-          if (loaderRef.current) {
-            loaderRef.current.style.opacity = "0";
-            loaderRef.current.style.pointerEvents = "none";
-          }
+        if (loaded === 10) renderFrame(0);
+        if (loaded >= FRAME_COUNT && loaderRef.current) {
+          loaderRef.current.style.opacity = "0";
+          loaderRef.current.style.pointerEvents = "none";
         }
       };
       images.push(img);
@@ -108,10 +157,10 @@ export default function HeroSection() {
     <section ref={containerRef} className={styles.heroWrapper} aria-label="Hero">
       <div className={styles.stickyContainer}>
 
-        {/* Canvas — desktop only (hidden on mobile via CSS) */}
+        {/* Canvas — desktop only */}
         <canvas ref={canvasRef} className={styles.canvas} />
 
-        {/* Static fallback — mobile only (hidden on desktop via CSS) */}
+        {/* Static fallback — mobile only */}
         <div className={styles.staticBg}>
           <Image
             src="/hero.png"
@@ -125,7 +174,7 @@ export default function HeroSection() {
 
         <div className={styles.overlay} />
 
-        {/* Loader — controlled via DOM ref, not React state */}
+        {/* Loader */}
         <div ref={loaderRef} className={styles.loader}>
           <div className={styles.loaderSpinner} />
           <span ref={loaderTextRef}>Loading experience... 0%</span>
@@ -135,8 +184,11 @@ export default function HeroSection() {
         <div className={styles.content}>
           <div className={styles.inner}>
 
-            {/* Header text: always uses scroll-driven MotionValue */}
-            <motion.div style={{ opacity: headerOpacity, y: headerY }}>
+            {/* Header text — opacity + transform driven via DOM ref */}
+            <div
+              ref={headerRef}
+              style={{ transition: "opacity 0.3s ease, transform 0.3s ease" }}
+            >
               <span className={styles.kicker}>
                 Full-Grain Leather · Handcrafted in Bangladesh
               </span>
@@ -148,10 +200,14 @@ export default function HeroSection() {
                 Premium leather wallets, cardholders, belts &amp; diary covers —
                 with optional custom embossing for a personal touch.
               </p>
-            </motion.div>
+            </div>
 
-            {/* CTAs: always uses scroll-driven MotionValue */}
-            <motion.div className={styles.ctas} style={{ opacity: ctaOpacity, y: ctaY }}>
+            {/* CTAs — fade in at end of scroll */}
+            <div
+              ref={ctaRef}
+              className={styles.ctas}
+              style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
+            >
               <Link href="/shop" className="btn btn-primary btn-lg">
                 Shop Collection
               </Link>
@@ -163,10 +219,14 @@ export default function HeroSection() {
               >
                 <WhatsAppIcon /> Order via WhatsApp
               </a>
-            </motion.div>
+            </div>
 
-            {/* Trust strip */}
-            <motion.div className={styles.trust} style={{ opacity: ctaOpacity, y: ctaY }}>
+            {/* Trust strip — fades in with CTAs */}
+            <div
+              ref={trustRef}
+              className={styles.trust}
+              style={{ transition: "opacity 0.4s ease, transform 0.4s ease" }}
+            >
               {["100% Full-Grain Leather", "Custom Embossing Available", "Ships Across Bangladesh"].map(
                 (item) => (
                   <span key={item} className={styles.trustItem}>
@@ -174,20 +234,21 @@ export default function HeroSection() {
                   </span>
                 )
               )}
-            </motion.div>
+            </div>
 
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <motion.div
+        <div
+          ref={indicatorRef}
           className={styles.scrollIndicator}
           aria-hidden="true"
-          style={{ opacity: indicatorOpacity }}
+          style={{ transition: "opacity 0.3s ease" }}
         >
           <div className={styles.scrollLine} />
           <span className={styles.scrollLabel}>Scroll</span>
-        </motion.div>
+        </div>
 
       </div>
     </section>

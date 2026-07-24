@@ -3,12 +3,21 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useScroll, useMotionValueEvent } from "framer-motion";
 import styles from "./SignatureCollection.module.css";
 
 const FRAME_COUNT = 240;
 const FRAME_URL = (index: number) =>
   `/Leather%20Product%20-frames/frame-${index.toString().padStart(4, "0")}.jpg`;
+
+// Frame ranges for each product (0-indexed)
+// 240 frames / 4 products = 60 frames each
+const PRODUCT_SEGMENTS = [
+  { start: 0,   end: 59  }, // Wallet
+  { start: 60,  end: 119 }, // Diary
+  { start: 120, end: 179 }, // Belt
+  { start: 180, end: 239 }, // Key Fob
+];
 
 const PRODUCTS = [
   {
@@ -34,7 +43,7 @@ const PRODUCTS = [
     kicker: "03 / 04",
     title: "Heritage Leather Belt",
     tagline: "Hold it together, in style.",
-    desc: "A staple for any wardrobe. Sturdy, elegant, and made from a single piece of full-grain leather for maximum durability.",
+    desc: "A staple for any wardrobe. Sturdy, elegant, and made from a single piece of full-grain leather.",
     link: "/shop",
     image: "/Leather Product -frames/frame-0163.jpg",
   },
@@ -51,47 +60,22 @@ const PRODUCTS = [
 
 export default function SignatureCollection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const loaderRef    = useRef<HTMLDivElement>(null);
   const loaderTextRef = useRef<HTMLSpanElement>(null);
-  const imagesRef = useRef<HTMLImageElement[]>([]);
-  const isMobileRef = useRef(false);
+  const imagesRef    = useRef<HTMLImageElement[]>([]);
+  const isMobileRef  = useRef(false);
+
+  // Refs to each text card DOM element — no React state, no re-renders
+  const cardRefs     = useRef<(HTMLDivElement | null)[]>([null, null, null, null]);
+  const activeCardRef = useRef<number>(0); // track which card is active
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // ─── ALL useTransform calls at top level — never inside loops ───────────
-  // Product 1: Wallet — visible 0%→22%, fades out 22%→25%
-  const op0 = useTransform(scrollYProgress, [0, 0.22, 0.25], [1, 1, 0], { clamp: true });
-  const y0  = useTransform(scrollYProgress, [0, 0.22, 0.25], [0, 0, -24], { clamp: true });
-  const pe0 = useTransform(op0, (v) => (v < 0.02 ? "none" : "auto"));
-
-  // Product 2: Diary — fades in 23%→27%, visible 27%→47%, fades out 47%→50%
-  const op1 = useTransform(scrollYProgress, [0.23, 0.27, 0.47, 0.50], [0, 1, 1, 0], { clamp: true });
-  const y1  = useTransform(scrollYProgress, [0.23, 0.27, 0.47, 0.50], [24, 0, 0, -24], { clamp: true });
-  const pe1 = useTransform(op1, (v) => (v < 0.02 ? "none" : "auto"));
-
-  // Product 3: Belt — fades in 48%→52%, visible 52%→72%, fades out 72%→75%
-  const op2 = useTransform(scrollYProgress, [0.48, 0.52, 0.72, 0.75], [0, 1, 1, 0], { clamp: true });
-  const y2  = useTransform(scrollYProgress, [0.48, 0.52, 0.72, 0.75], [24, 0, 0, -24], { clamp: true });
-  const pe2 = useTransform(op2, (v) => (v < 0.02 ? "none" : "auto"));
-
-  // Product 4: Key Fob — fades in 73%→77%, stays visible to 100%
-  const op3 = useTransform(scrollYProgress, [0.73, 0.77, 1.0], [0, 1, 1], { clamp: true });
-  const y3  = useTransform(scrollYProgress, [0.73, 0.77, 1.0], [24, 0, 0], { clamp: true });
-  const pe3 = useTransform(op3, (v) => (v < 0.02 ? "none" : "auto"));
-
-  const cardAnimations = [
-    { opacity: op0, y: y0, pointerEvents: pe0 },
-    { opacity: op1, y: y1, pointerEvents: pe1 },
-    { opacity: op2, y: y2, pointerEvents: pe2 },
-    { opacity: op3, y: y3, pointerEvents: pe3 },
-  ];
-  // ────────────────────────────────────────────────────────────────────────
-
-  // Canvas draw
+  // ── Canvas rendering ────────────────────────────────────────────────────
   const renderFrame = (index: number) => {
     const canvas = canvasRef.current;
     const img = imagesRef.current[index];
@@ -107,26 +91,69 @@ export default function SignatureCollection() {
       ctx.scale(dpr, dpr);
     }
 
-    // Cover — fills full screen, crops edges if needed
     const hRatio = rect.width / img.width;
     const vRatio = rect.height / img.height;
-    const ratio = Math.max(hRatio, vRatio);
-    const sx = (rect.width - img.width * ratio) / 2;
+    const ratio  = Math.max(hRatio, vRatio);
+    const sx = (rect.width  - img.width  * ratio) / 2;
     const sy = (rect.height - img.height * ratio) / 2;
 
     ctx.clearRect(0, 0, rect.width, rect.height);
     ctx.drawImage(img, 0, 0, img.width, img.height, sx, sy, img.width * ratio, img.height * ratio);
   };
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+  // ── Text card swap — pure DOM manipulation, zero React state ────────────
+  const showCard = (index: number) => {
+    const prev = activeCardRef.current;
+    if (prev === index) return;
+
+    const prevEl = cardRefs.current[prev];
+    const nextEl = cardRefs.current[index];
+
+    if (prevEl) {
+      prevEl.style.opacity = "0";
+      prevEl.style.transform = "translateY(-20px)";
+      prevEl.style.pointerEvents = "none";
+    }
+    if (nextEl) {
+      nextEl.style.opacity = "1";
+      nextEl.style.transform = "translateY(0px)";
+      nextEl.style.pointerEvents = "auto";
+    }
+
+    activeCardRef.current = index;
+  };
+
+  // ── Single scroll listener drives both canvas and text card ─────────────
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
     if (isMobileRef.current) return;
-    const frameIndex = Math.min(FRAME_COUNT - 1, Math.max(0, Math.floor(latest * FRAME_COUNT)));
+
+    // Canvas frame
+    const frameIndex = Math.min(FRAME_COUNT - 1, Math.max(0, Math.floor(progress * FRAME_COUNT)));
     requestAnimationFrame(() => renderFrame(frameIndex));
+
+    // Active text card (which quarter of the scroll are we in?)
+    const cardIndex = Math.min(3, Math.floor(progress * 4));
+    showCard(cardIndex);
   });
 
+  // ── Preload images ───────────────────────────────────────────────────────
   useEffect(() => {
     isMobileRef.current = window.innerWidth <= 768;
     if (isMobileRef.current) return;
+
+    // Set initial card state — card 0 visible, rest hidden
+    cardRefs.current.forEach((el, i) => {
+      if (!el) return;
+      if (i === 0) {
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0px)";
+        el.style.pointerEvents = "auto";
+      } else {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(20px)";
+        el.style.pointerEvents = "none";
+      }
+    });
 
     let loaded = 0;
     const images: HTMLImageElement[] = [];
@@ -137,7 +164,8 @@ export default function SignatureCollection() {
       img.onload = () => {
         loaded++;
         if (loaderTextRef.current) {
-          loaderTextRef.current.textContent = `Loading collection... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
+          loaderTextRef.current.textContent =
+            `Loading collection... ${Math.round((loaded / FRAME_COUNT) * 100)}%`;
         }
         if (loaded === 10) renderFrame(0);
         if (loaded >= FRAME_COUNT && loaderRef.current) {
@@ -153,28 +181,28 @@ export default function SignatureCollection() {
   return (
     <section ref={containerRef} className={styles.wrapper} aria-label="Signature Collection">
 
-      {/* ── Desktop: Sticky full-screen canvas + overlay text ── */}
+      {/* ── Desktop: Sticky full-screen experience ── */}
       <div className={styles.sticky}>
 
-        {/* Full-width canvas */}
         <canvas ref={canvasRef} className={styles.canvas} />
 
-        {/* Loader */}
         <div ref={loaderRef} className={styles.loader}>
           <div className={styles.loaderSpinner} />
           <span ref={loaderTextRef}>Loading collection... 0%</span>
         </div>
 
-        {/* Gradient behind text — transparent on left, dark on right */}
+        {/* Gradient makes text readable without covering image */}
         <div className={styles.textGradient} aria-hidden="true" />
 
-        {/* Text panel — overlaid on top of canvas */}
+        {/* Text panel — all cards stacked, only one visible at a time */}
         <div className={styles.textPanel}>
           {PRODUCTS.map((product, i) => (
-            <motion.div
+            <div
               key={product.id}
+              ref={(el) => { cardRefs.current[i] = el; }}
               className={styles.productCard}
-              style={cardAnimations[i]}
+              // Initial visibility set in useEffect via DOM ref
+              style={{ opacity: 0, transform: "translateY(20px)", pointerEvents: "none" }}
             >
               <span className={styles.kicker}>{product.kicker}</span>
               <h2 className={styles.title}>{product.title}</h2>
@@ -183,7 +211,7 @@ export default function SignatureCollection() {
               <Link href={product.link} className={`btn btn-primary ${styles.cta}`}>
                 Shop Collection
               </Link>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
