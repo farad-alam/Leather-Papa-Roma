@@ -41,7 +41,6 @@ export default function Testimonials() {
   const timerRef = useRef<NodeJS.Timeout>(null);
   const startTimeRef = useRef<number>(Date.now());
 
-  const prev = () => setActive((a) => (a - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
   const next = () => setActive((a) => (a + 1) % TESTIMONIALS.length);
 
   useEffect(() => {
@@ -87,74 +86,44 @@ export default function Testimonials() {
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.6 }}
         >
-          <span className="label-caps">Customer Stories</span>
           <h2 id="testimonials-heading" className={styles.title}>
-            What Our Customers Say
+            <span className={styles.titleLine1}>Customer</span>
+            <span className={styles.titleLine2}>Stories</span>
           </h2>
         </motion.div>
 
         <div
-          className={styles.carousel}
+          className={styles.carouselArea}
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => {
             setIsPaused(false);
             startTimeRef.current = Date.now() - (progress / 100) * AUTOPLAY_INTERVAL;
           }}
         >
-          <button className={styles.navBtn} onClick={() => handleNav((active - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)} aria-label="Previous testimonial">←</button>
+          <div className={styles.quoteMarkLeft} aria-hidden="true">“</div>
 
-          <div className={styles.cardWrapper}>
-            <div className={styles.quoteMark} aria-hidden="true">"</div>
+          <div className={styles.cardContainer}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={t.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
                 className={styles.card}
               >
-                {/* Stars stagger in */}
-                <motion.div
-                  className={styles.stars}
-                  initial="hidden"
-                  animate="show"
-                  variants={{
-                    hidden: { opacity: 0 },
-                    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-                  }}
-                  aria-label={`${t.rating} out of 5 stars`}
-                >
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <motion.span
-                      key={i}
-                      className={styles.star}
-                      variants={{ hidden: { scale: 0 }, show: { scale: 1 } }}
-                    >★</motion.span>
-                  ))}
-                </motion.div>
-
                 <blockquote className={styles.quote}>
-                  &ldquo;{t.text}&rdquo;
+                  {t.text}
                 </blockquote>
-
                 <div className={styles.author}>
-                  <div className={styles.authorInitial}>{t.name[0]}</div>
-                  <div>
-                    <div className={styles.authorName}>{t.name}</div>
-                    <div className={styles.authorProduct}>Purchased: {t.product}</div>
-                  </div>
-                  {t.verified && (
-                    <span className={`badge badge-green ${styles.verifiedBadge}`}>
-                      ✓ Verified Buyer
-                    </span>
-                  )}
+                  {t.name}
+                  {t.verified && <span className={styles.verifiedDot}>• Verified Buyer</span>}
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          <button className={styles.navBtn} onClick={() => handleNav((active + 1) % TESTIMONIALS.length)} aria-label="Next testimonial">→</button>
+          <div className={styles.quoteMarkRight} aria-hidden="true">”</div>
         </div>
 
         {/* Progress Bar & Dots */}

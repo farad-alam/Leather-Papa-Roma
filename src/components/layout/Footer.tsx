@@ -1,7 +1,7 @@
 import Link from "next/link";
 import styles from "./Footer.module.css";
 
-const CATEGORIES = [
+const SHOP_LINKS = [
   { label: "Wallets", href: "/shop/wallets" },
   { label: "Cardholders", href: "/shop/cardholders" },
   { label: "Belts", href: "/shop/belts" },
@@ -10,95 +10,93 @@ const CATEGORIES = [
   { label: "Gift Sets", href: "/shop/gift-sets" },
 ];
 
-const LINKS = [
+const INFO_LINKS = [
   { label: "Our Craft", href: "/about" },
   { label: "Gift Guide", href: "/gift-guide" },
   { label: "Contact Us", href: "/contact" },
+  { label: "Track Order", href: "/order-success" },
 ];
 
 export default function Footer() {
   const whatsappUrl = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi, I'd like to place an order or ask about your leather products.")}`;
+  const year = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.inner}>
-        {/* Brand column */}
-        <div className={styles.brand}>
-          <div className={styles.logoBlock}>
-            <span className={styles.logoMain}>PAPA ROMA</span>
-            <span className={styles.logoDivider} />
-            <span className={styles.logoSub}>LEATHER</span>
-          </div>
-          <p className={styles.tagline}>
-            Full-grain leather goods, crafted for those who appreciate the real thing.
-          </p>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`btn btn-whatsapp btn-sm ${styles.whatsappBtn}`}
-          >
-            <WhatsAppIcon /> Chat on WhatsApp
-          </a>
-        </div>
 
-        {/* Shop column */}
-        <div className={styles.col}>
-          <h3 className={`label-caps ${styles.colTitle}`}>Shop</h3>
-          <ul className={styles.linkList}>
-            {CATEGORIES.map((cat) => (
-              <li key={cat.href}>
-                <Link href={cat.href} className={styles.footerLink}>
-                  {cat.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Info column */}
-        <div className={styles.col}>
-          <h3 className={`label-caps ${styles.colTitle}`}>Information</h3>
-          <ul className={styles.linkList}>
-            {LINKS.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className={styles.footerLink}>
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Payment column */}
-        <div className={styles.col}>
-          <h3 className={`label-caps ${styles.colTitle}`}>We Accept</h3>
-          <div className={styles.paymentBadges}>
-            <div className={styles.payBadge} style={{ background: "#E2136E" }}>
-              <span className={styles.payText}>bKash</span>
-            </div>
-            <div className={styles.payBadge} style={{ background: "#F26522" }}>
-              <span className={styles.payText}>Nagad</span>
-            </div>
-            <div className={styles.payBadge} style={{ background: "#2d7a3a" }}>
-              <span className={styles.payText}>COD</span>
+      {/* ── CTA Strip ── */}
+      <div className={styles.ctaStrip}>
+        <div className={styles.ctaInner}>
+          <div className={styles.ctaLeft}>
+            <p className={styles.ctaEyebrow}>Handcrafted in Bangladesh</p>
+            <h2 className={styles.ctaHeading}>
+              A piece made for<br />
+              <em>you, forever.</em>
+            </h2>
+            <div className={styles.ctaActions}>
+              <Link href="/shop" className="btn btn-primary btn-lg">
+                Shop Collection
+              </Link>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`btn btn-ghost btn-lg ${styles.waBtn}`}
+              >
+                <WhatsAppIcon /> Chat on WhatsApp
+              </a>
             </div>
           </div>
-          <p className={styles.shipping}>
-            📦 Ships across Bangladesh<br />
-            Dhaka: ৳80 · Outside: ৳150
-          </p>
+
+          <div className={styles.columns}>
+            <div className={styles.col}>
+              <p className={styles.colTitle}>Shop</p>
+              <ul className={styles.linkList}>
+                {SHOP_LINKS.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className={styles.footerLink}>{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={styles.col}>
+              <p className={styles.colTitle}>Company</p>
+              <ul className={styles.linkList}>
+                {INFO_LINKS.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className={styles.footerLink}>{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={styles.col}>
+              <p className={styles.colTitle}>Social</p>
+              <ul className={styles.linkList}>
+                <li><a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>Facebook</a></li>
+                <li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>Instagram</a></li>
+                <li><a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={styles.footerLink}>WhatsApp</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className={styles.bottom}>
-        <div className={styles.bottomInner}>
-          <p className={styles.copyright}>
-            © {new Date().getFullYear()} Papa Roma Leather. Crafted with pride in Bangladesh.
-          </p>
-          <p className={styles.madeIn}>🇧🇩 Bangladesh</p>
-        </div>
+      {/* ── Divider ── */}
+      <div className={styles.dividerLine} />
+
+      {/* ── Bottom Bar ── */}
+      <div className={styles.bottomBar}>
+        <p className={styles.copyright}>© {year} Papa Roma Leather. All rights reserved.</p>
+        <p className={styles.madeIn}>🇧🇩 Crafted with pride in Bangladesh</p>
       </div>
+
+      {/* ── Giant Brand Name ── */}
+      <div className={styles.bigNameWrap} aria-hidden="true">
+        <span className={styles.bigName}>PAPA ROMA</span>
+      </div>
+
     </footer>
   );
 }

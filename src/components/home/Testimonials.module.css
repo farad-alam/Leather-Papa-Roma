@@ -1,156 +1,121 @@
 .section {
-  background-color: var(--ivory);
+  background-color: var(--ink-light); /* Slightly lighter dark background to contrast with footer */
+  color: var(--ivory);
   position: relative;
   overflow: hidden;
 }
 
-/* Faint radial gradient */
-.section::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(circle, rgba(201, 169, 110, 0.08) 0%, transparent 70%);
-  pointer-events: none;
-}
-
+/* ─── Header ────────────────────────────────────────────── */
 .header {
   text-align: center;
   margin-bottom: var(--space-12);
 }
 
 .title {
-  margin-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  font-family: var(--font-body); /* Using sans-serif for modern look like inspiration */
+  letter-spacing: -0.02em;
 }
 
-/* ─── Carousel ────────────────────────────────────────────── */
-.carousel {
+.titleLine1 {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 500;
+  color: var(--ivory);
+}
+
+.titleLine2 {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  font-weight: 500;
+  color: var(--gold); /* Highlight color */
+}
+
+/* ─── Carousel Area ─────────────────────────────────────── */
+.carouselArea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-6);
-  max-width: 900px;
+  gap: var(--space-8);
+  max-width: 1000px;
   margin-inline: auto;
-  min-height: 400px;
+  min-height: 300px;
 }
 
-.navBtn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--cognac);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition);
-  flex-shrink: 0;
-  z-index: 2;
-}
-
-.navBtn:hover {
-  background: var(--cognac);
-  color: var(--ivory);
-  border-color: var(--cognac);
-}
-
-.cardWrapper {
-  flex: 1;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  padding: var(--space-8);
-}
-
-/* Large decorative quote mark */
-.quoteMark {
-  position: absolute;
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-display);
-  font-size: 200px;
-  line-height: 1;
-  color: var(--parchment);
-  opacity: 0.5;
-  z-index: 0;
+/* Giant Quote Marks */
+.quoteMarkLeft,
+.quoteMarkRight {
+  font-family: Arial, Helvetica, sans-serif; /* Chunky sans-serif for quotes */
+  font-size: clamp(8rem, 15vw, 15rem);
+  line-height: 0.7;
+  font-weight: 900;
   user-select: none;
+  
+  /* Gradient effect for quotes */
+  background: linear-gradient(to bottom, var(--gold-light), var(--cognac-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  flex-shrink: 0;
+  /* Add subtle noise texture using a filter or opacity */
+  opacity: 0.9;
+}
+
+.quoteMarkLeft {
+  transform: translateY(-20px);
+}
+
+.quoteMarkRight {
+  transform: translateY(20px);
+}
+
+.cardContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: left; /* Left align text in the center block */
+  position: relative;
 }
 
 .card {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 650px;
-}
-
-.stars {
-  color: var(--gold);
-  font-size: var(--text-2xl);
-  margin-bottom: var(--space-6);
-  display: flex;
-  justify-content: center;
-  gap: var(--space-1);
+  width: 100%;
 }
 
 .quote {
-  font-family: var(--font-display);
-  font-size: clamp(var(--text-xl), 3vw, var(--text-3xl));
-  line-height: 1.5;
-  color: var(--ink);
-  margin-bottom: var(--space-8);
-  font-style: italic;
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  line-height: 1.6;
+  color: rgba(250, 246, 240, 0.9);
+  margin-bottom: var(--space-6);
+  font-weight: 400;
 }
 
 .author {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  text-align: left;
-}
-
-.authorInitial {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--cognac);
-  color: var(--ivory);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-}
-
-.authorName {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.authorProduct {
   font-size: var(--text-sm);
-  color: var(--text-muted);
+  font-weight: 600;
+  color: var(--gold); /* Match author name to highlight color */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.verifiedBadge {
-  margin-left: var(--space-2);
+.verifiedDot {
+  font-weight: 400;
+  color: rgba(250, 246, 240, 0.5);
 }
 
 /* ─── Controls (Dots + Progress) ─────────────────────────── */
 .controls {
-  max-width: 400px;
+  max-width: 300px;
   margin-inline: auto;
-  margin-top: var(--space-8);
+  margin-top: var(--space-16);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-6);
 }
 
 .dots {
@@ -162,7 +127,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--border-strong);
+  background: rgba(250, 246, 240, 0.2);
   border: none;
   cursor: pointer;
   transition: all var(--transition);
@@ -170,36 +135,53 @@
 }
 
 .activeDot {
-  background: var(--cognac);
+  background: var(--gold);
   transform: scale(1.3);
 }
 
 .progressBarBg {
   width: 100%;
   height: 2px;
-  background: var(--parchment-dark);
+  background: rgba(250, 246, 240, 0.1);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .progressBarFill {
   height: 100%;
-  background: var(--cognac);
+  background: var(--gold);
   transition: width 0.1s linear; /* Smooth fill */
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .navBtn {
-    display: none; /* Hide arrows on mobile, let them use dots */
+@media (max-width: 900px) {
+  .carouselArea {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-4);
+  }
+  
+  .cardContainer {
+    text-align: center;
+    padding: 0 var(--space-4);
+  }
+  
+  .quoteMarkLeft,
+  .quoteMarkRight {
+    font-size: 6rem;
+  }
+  
+  .quoteMarkLeft {
+    align-self: flex-start;
+    transform: none;
+  }
+  
+  .quoteMarkRight {
+    align-self: flex-end;
+    transform: none;
   }
   
   .author {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .verifiedBadge {
-    margin-left: 0;
+    justify-content: center;
   }
 }

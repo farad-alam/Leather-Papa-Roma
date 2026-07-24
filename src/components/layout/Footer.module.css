@@ -1,83 +1,106 @@
+/* ═══════════════════════════════════════════════════════
+   FOOTER — Premium dark editorial style
+   Inspiration: Mount Media · Converto · Inspirux
+   ═══════════════════════════════════════════════════════ */
+
 .footer {
   background: var(--ink);
   color: var(--ivory);
-  padding-top: var(--space-16);
+  overflow: hidden;
+  position: relative;
 }
 
-.inner {
+/* ── CTA Strip ──────────────────────────────────────── */
+.ctaStrip {
+  padding: clamp(4rem, 8vw, 7rem) var(--container-padding) clamp(3rem, 5vw, 4.5rem);
+}
+
+.ctaInner {
   max-width: var(--container-max);
   margin-inline: auto;
-  padding-inline: var(--container-padding);
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-12);
-  padding-bottom: var(--space-16);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* ─── Brand ────────────────────────────────────────────────── */
-.brand {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-.logoBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.logoMain {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  color: var(--ivory);
-}
-
-.logoDivider {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: var(--gold);
-}
-
-.logoSub {
-  font-family: var(--font-body);
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--warm-grey-light);
-}
-
-.tagline {
-  font-size: var(--text-sm);
-  color: rgba(250, 246, 240, 0.65);
-  line-height: 1.6;
-  max-width: 28ch;
-}
-
-.whatsappBtn {
-  align-self: flex-start;
-  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
 }
 
-/* ─── Columns ──────────────────────────────────────────────── */
-.col {
+/* ── Left CTA ── */
+.ctaLeft {
   display: flex;
   flex-direction: column;
+  gap: var(--space-8);
+}
+
+.ctaEyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.ctaHeading {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 4.5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--ivory);
+  letter-spacing: -0.01em;
+}
+
+.ctaHeading em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.ctaActions {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-4);
 }
 
+.waBtn {
+  border-color: rgba(250, 246, 240, 0.3) !important;
+}
+.waBtn:hover {
+  background: rgba(250, 246, 240, 0.1) !important;
+  border-color: var(--ivory) !important;
+}
+
+
+
+/* ── Divider ────────────────────────────────────────── */
+.dividerLine {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  margin-inline: clamp(1rem, 4vw, 2.5rem);
+  height: 1px;
+  background: rgba(250, 246, 240, 0.08);
+}
+
+/* ── Columns ────────────────────────────────────────── */
+.columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+  justify-content: flex-end;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 120px;
+}
+
 .colTitle {
-  color: var(--warm-grey-light) !important;
-  font-size: var(--text-xs) !important;
-  margin-bottom: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(250, 246, 240, 0.4);
+  margin-bottom: var(--space-1);
 }
 
 .linkList {
@@ -89,86 +112,106 @@
 
 .footerLink {
   font-size: var(--text-sm);
-  color: rgba(250, 246, 240, 0.7);
+  color: rgba(250, 246, 240, 0.65);
   text-decoration: none;
-  transition: color var(--transition-fast);
+  transition: color var(--transition-fast), transform var(--transition-fast);
   display: inline-block;
 }
 
 .footerLink:hover {
-  color: var(--gold);
-  transform: translateX(2px);
+  color: var(--gold-light);
+  transform: translateX(3px);
 }
 
-/* ─── Payment ──────────────────────────────────────────────── */
-.paymentBadges {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.payBadge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.3rem 0.75rem;
-  border-radius: var(--radius-sm);
-}
-
-.payText {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  color: white;
-  letter-spacing: 0.05em;
-}
-
-.shipping {
-  font-size: var(--text-xs);
-  color: rgba(250, 246, 240, 0.5);
-  line-height: 1.7;
-}
-
-/* ─── Bottom bar ───────────────────────────────────────────── */
-.bottom {
-  padding-block: var(--space-6);
-}
-
-.bottomInner {
+/* ── Bottom Bar ─────────────────────────────────────── */
+.bottomBar {
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--container-padding);
+  padding-block: var(--space-6);
+  border-top: 1px solid rgba(250, 246, 240, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
 }
 
-.copyright {
-  font-size: var(--text-xs);
-  color: rgba(250, 246, 240, 0.4);
-}
-
+.copyright,
 .madeIn {
   font-size: var(--text-xs);
-  color: rgba(250, 246, 240, 0.4);
+  color: rgba(250, 246, 240, 0.35);
+  letter-spacing: 0.03em;
 }
 
-/* ─── Responsive ───────────────────────────────────────────── */
+/* ── Giant Brand Name ───────────────────────────────── */
+.bigNameWrap {
+  width: 100%;
+  overflow: hidden;
+  line-height: 1;
+  /* Creates the "bleeding" brand name effect from the inspiration */
+  margin-top: calc(var(--space-4) * -1);
+  pointer-events: none;
+  user-select: none;
+}
+
+.bigName {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 16vw, 15rem);
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  line-height: 0.85;
+
+  /* Gradient: opaque cognac at top → fully transparent at bottom */
+  background: linear-gradient(
+    to bottom,
+    rgba(139, 69, 19, 0.55) 0%,
+    rgba(139, 69, 19, 0.15) 50%,
+    transparent 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  /* Push text a bit lower so it bleeds out of frame */
+  transform: translateY(18%);
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 1024px) {
-  .inner {
-    grid-template-columns: 1fr 1fr;
+  .ctaInner {
+    grid-template-columns: 1fr;
+    gap: var(--space-12);
+  }
+  .columns {
+    justify-content: flex-start;
+    padding-top: var(--space-8);
+    border-top: 1px solid rgba(250, 246, 240, 0.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .columns {
+    flex-wrap: wrap;
     gap: var(--space-10);
   }
-  .brand { grid-column: 1 / -1; }
+  .ctaActions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .bigName {
+    font-size: clamp(4rem, 20vw, 8rem);
+  }
 }
 
-@media (max-width: 640px) {
-  .inner {
-    grid-template-columns: 1fr;
-    gap: var(--space-8);
-  }
-  .bottomInner {
+@media (max-width: 480px) {
+  .bottomBar {
     flex-direction: column;
     text-align: center;
+    gap: var(--space-2);
   }
 }
